@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title>PREINDEX</title>
+
+		<link href="../css/mui.min.css" rel="stylesheet" />
+		<script src="../js/mui.min.js"></script>
+		<script src="../js/constants.js"></script>
+
+		<style>
+			.bbo {
+				padding: 30px;
+				padding-top: 50px;
+			}
+			
+			.bb {
+				border: #1699C5;
+				background-color: #1699C5;
+			}
+			
+			.company {
+				width: 100%;
+				height: 50px;
+				position: fixed;
+				bottom: 0;
+				text-align: center;
+				font-size: 11px;
+				z-index: -1;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div class="mui-content">
+			<div style="padding-top: 70px;padding-bottom: 40px;">
+				<div align="center">
+					<img src="../img/title_logo.png" style="width: 260px;" />
+				</div>
+
+				<div align="center" class="bbo">
+					<div id="out">
+						<button type="button" class="mui-btn mui-btn-primary mui-btn-block bb" id="traveller">旅客登录</button>
+					</div>
+
+					<div id="in">
+						<button type="button" class="mui-btn mui-btn-primary mui-btn-block bb" id="employee">员工登录</button>
+					</div>
+				</div>
+			</div>
+
+			<div class="company">
+				<div>青岛机场集团 V1.2.0</div>
+				<div>copyright@2019</div>
+			</div>
+		</div>
+
+		<script>
+			(function($, doc) {
+				$.init();
+				$.plusReady(function() {
+
+					document.getElementById('employee').addEventListener('tap', function() {
+						//remember nowtime select 
+						var settings = constants.getSettings();
+						settings.type = 'employee';
+						constants.setSettings(settings);
+
+						mui.openWindow({
+							url: '../index.html',
+							id: 'index.html',
+							show: {
+								autoShow: true,
+								aniShow: "none",
+								duration: '0'
+							},
+							waiting: {
+								autoShow: false,
+							}
+						});
+					});
+
+					document.getElementById('traveller').addEventListener('tap', function() {
+						var settings = constants.getSettings();
+						settings.type = 'traveller';
+						constants.setSettings(settings);
+
+						mui.openWindow({
+							url: 'out/outmain.html',
+							id: 'outmain.html',
+							show: {
+								autoShow: true,
+								aniShow: "none",
+								duration: '0'
+							},
+							waiting: {
+								autoShow: false,
+							}
+						});
+					});
+
+					var settings = constants.getSettings();
+					if(settings.type == null) {
+						console.log(settings.type);
+					} else {
+						console.log(settings.type);
+						if(settings.type == 'employee') {
+							var empBtn = document.getElementById('employee');
+							mui.trigger(empBtn, 'tap');
+						} else if(settings.type == 'traveller') {
+							var traBtn = doc.getElementById('traveller');
+							$.trigger(traBtn, 'tap');
+						}
+					}
+
+				});
+			})(mui, document);
+		</script>
+	</body>
+
+</html>

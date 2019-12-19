@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html style="touch-action: none;">
+<!--<html>-->
+	<head>
+		<meta charset="utf-8"> 
+		<title>main</title>
+		
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />		
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+				
+		<link rel="stylesheet" href="../css/mui.min.css" />
+		<script src="../js/mui.min.js"></script>
+	</head>
+
+	<body>
+		<nav class="mui-bar mui-bar-tab" id="nav">
+			<a class="mui-tab-item mui-active" id="a1" href="a1.html">
+			<!--<a class="mui-tab-item mui-active" id="a1">-->
+				<span class="mui-icon mui-icon-list"></span>
+				<span class="mui-tab-label">首页</span>
+			</a>
+			<a class="mui-tab-item" id="a4" href="a4.html">
+			<!--<a class="mui-tab-item" id="a4">-->
+				<span class="mui-icon mui-icon-paperplane"></span>
+				<span class="mui-tab-label">通讯录</span>
+			</a>
+			<a class="mui-tab-item" id="a2" href="a2.html">
+			<!--<a class="mui-tab-item" id="a2">-->
+				<span class="mui-icon mui-icon-compose"></span>
+				<span class="mui-tab-label">日志</span>
+			</a>
+			<a class="mui-tab-item" id="a3" href="a3.html">
+			<!--<a class="mui-tab-item" id="a3">-->
+				<span class="mui-icon mui-icon-email"></span>
+				<span class="mui-tab-label">公告</span>
+			</a>
+			<a class="mui-tab-item" id="a5"  href="a5.html">
+			<!--<a class="mui-tab-item" id="a5">-->
+				<span class="mui-icon mui-icon-contact "></span>
+				<span class="mui-tab-label ">个人</span>
+			</a>
+		</nav>
+		
+		<script>			
+			var subpages = ['a1.html', 'a4.html', 'a2.html', 'a3.html', 'a5.html'];
+			
+			var subpage_style = {
+				top: '0px',
+				bottom: '50px',
+				scrollIndicator: "none"
+			};
+		
+			mui.plusReady(function() {
+				var self = plus.webview.currentWebview();	
+				
+				for(var i = 0; i < subpages.length; i++) {
+					var sub = plus.webview.create(subpages[i], subpages[i], subpage_style);
+//					var sub = plus.webview.create(
+//						'a1.html',
+//						'a1.html', {
+//							top: '0px',
+//							bottom: '50px',
+//							scrollIndicator: "none",
+//						});	
+					if(i > 0) { 
+						sub.hide();
+					}
+					self.append(sub);
+				}
+				
+				//nva固定底部
+				document.getElementById('nav').style.top = (plus.display.resolutionHeight - 50) + "px";
+			});
+		
+			var activeTab = subpages[0];
+			
+			mui('.mui-bar-tab').on('tap', 'a', function(e) {
+				var targetTab = this.getAttribute('href');
+//				var targetTab = this.getAttribute('id')+'.html';
+//				console.log(targetTab);
+				
+				if(targetTab == activeTab) {
+					return;
+				}
+				
+				plus.webview.show(targetTab);
+				plus.webview.hide(activeTab);
+				activeTab = targetTab;
+			});
+		
+			//主页点击两次退出
+			var backButtonPress = 0;
+			mui.back = function(event) {
+				backButtonPress++;
+				if (backButtonPress > 1) {
+					plus.runtime.quit();
+				} else {
+					plus.nativeUI.toast('再按一次退出应用');
+				}
+				setTimeout(function() {
+					backButtonPress = 0;
+				}, 1000);
+				return false;
+			};
+		
+		</script>
+	</body>
+
+</html>

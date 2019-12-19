@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>listeditor</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+		<link rel="stylesheet" href="../../css/mui.min.css">
+
+		<script src="../../js/mui.min.js"></script>
+		<script src="../../js/serverutils.js"></script>
+		<script src="../../js/ajaxutils.js"></script>
+		<script src="../../js/constants.js"></script>
+		<script src="../../js/checkboxutils.js"></script>
+		
+		<style>
+			.formstyle {
+				margin-left: 5px;
+				margin-right: 5px;
+			}
+			
+			.updown {
+				margin-top: 5px;
+				margin-bottom: 5px;
+				align-content: center;
+			}
+			
+			.listform {
+				margin-left: 5px;
+				margin-right: 5px;								
+				height: 220px;
+				border-style: solid;
+				border-width: 1px;
+				border-color: #1699C5;
+				border-radius: 5px;		
+				width: 97%;
+			}
+			
+			.searchform{
+				width:98%;
+				white-space:nowrap;
+				overflow:auto;
+				padding-top: 3px;
+				padding-bottom: 0px;			
+			}
+			.searchbtn{
+				display: inline-block;
+				width:16%;
+				float: right;
+			}
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">维护关注列表</h1>
+		</header>
+
+		<div class="mui-content">
+			<form class="mui-input-group formstyle">
+				<div class="searchform">
+					<label  style="display: inline-block;width:12%;">姓名:</label>
+					<input id="queryname" type="text" class="mui-input-clear" placeholder="请输入查询姓名"  style="display: inline-block;width:60%;">
+					<button type="button" class="mui-btn mui-btn-primary searchbtn" id="query">查询</button>
+				</div>
+			</form>
+
+			<div class="mui-scroll-wrapper mui-checkbox listform" id="querycheckbox">
+				<div class="mui-scroll" id="querylist">					
+				</div>
+			</div>
+
+			<div class="mui-button-row">
+				<span class="mui-icon mui-icon-download" id="down"></span>
+				<span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+				<span class="mui-icon mui-icon-upload" id="up"></span>
+			</div>
+
+			<div class="mui-scroll-wrapper mui-checkbox  listform" id="nowcheckbox">
+				<div class="mui-scroll" id="nowlist">					
+				</div>
+			</div>
+
+			<div class="mui-button-row">
+				<button type="button" class="mui-btn mui-btn-primary" id="savebtn">确认</button>
+				<button type="button" class="mui-btn mui-btn-danger" id="cancelbtn">取消</button>
+			</div>
+		</div>
+
+		<script>			
+			(function($, doc) {
+				$.init();
+				$.ready(function() {
+					//mui.scroll("#querylist");
+					mui('.mui-scroll-wrapper').scroll({
+						deceleration: 0.0005,
+						indicators: true, //是否显示滚动条
+					});
+					
+					var state = constants.getState();
+					var data = {
+						'id': state.pid
+					};
+					
+					console.log(data.id);
+					
+					var orilist=[];
+
+					postData(SERVER_HOST_FORMAL + MODULE_INTEREST_LISTBYID, data,
+						function(ret) {
+							console.log(ret);
+							var list = JSON.parse(ret);
+							var objTable = doc.getElementById("nowlist");	
+							
+							for(var i=0;i<list.length;i++){
+								var name=list[i].name;
+								var emid=list[i].employeid;
+								
+								orilist.push(emid);
+								
+								var div = doc.createElement('div');
+								var label=doc.createElement('label');
+								var input=doc.createElement('input');
+								
+								div.setAttribute("class","mui-input-row mui-checkbox mui-left");
+								div.setAttribute("id",emid);  //如果不做处理，会有上下相同id的情况，所以统一下半部分用id，上半部分用query+id
+								input.setAttribute("name",name);
+								input.setAttribute("value",emid);
+								input.setAttribute("type","checkbox");
+								input.setAttribute("class","nowcheck");
+								
+								label.innerText=name;
+								div.appendChild(label);
+								div.appendChild(input);
+								objTable.appendChild(div);
+							}
+						},
+						null
+					);
+					
+					doc.getElementById('query').addEventListener('tap',function(){						
+						var fuzzyname=doc.getElementById('queryname').value;
+						if(fuzzyname=='' || fuzzyname==null){
+							mui.alert("请输出查询姓名", "提示", "OK", null);
+							return;
+						}
+						var fdata = {
+							'name': fuzzyname
+						};
+						postData(SERVER_HOST_FORMAL + MODULE_FUZZYQUERY_EMPLOYEE, fdata,
+							function(ret) {
+								console.log(ret);
+								var list = JSON.parse(ret);
+								var objTable = doc.getElementById("querylist");	
+								
+								//clear
+								while(objTable.hasChildNodes()){
+									objTable.removeChild(objTable.firstChild);
+								}
+								
+								for(var i=0;i<list.length;i++){
+									var name=list[i].ename;
+									var emid=list[i].eid;
+									
+									var div = doc.createElement('div');
+									var label=doc.createElement('label');
+									var input=doc.createElement('input');
+									
+									div.setAttribute("class","mui-input-row mui-checkbox mui-left");
+									div.setAttribute("id","query"+emid);
+									input.setAttribute("name",name);
+									input.setAttribute("value",emid);
+									input.setAttribute("type","checkbox");
+									input.setAttribute("class","querycheck");
+									
+									label.innerText=name;
+									div.appendChild(label);
+									div.appendChild(input);
+									objTable.appendChild(div);
+								}
+							},
+							null
+						);
+					});
+					
+					//tap down to add selected employee 
+					doc.getElementById('down').addEventListener('tap',function(){
+						var res=getCheckBoxRes('querycheck');
+						//console.log(res);			
+						for(var i=0;i<res.length;i++){
+							var map=res[i];
+							var ename=map['name'];
+							var eid=map['id'];
+							
+							//console.log(ename+' , '+eid);
+							var qlist=doc.getElementById('querylist');
+							var nlist=doc.getElementById('nowlist');
+							
+							//delete
+							var node=doc.getElementById('query'+eid);
+							qlist.removeChild(node);
+							
+							//add to the list head
+							var div = doc.createElement('div');
+							var label=doc.createElement('label');
+							var input=doc.createElement('input');
+							
+							div.setAttribute("class","mui-input-row mui-checkbox mui-left");
+							div.setAttribute("id",eid);
+							input.setAttribute("name",ename);
+							input.setAttribute("value",eid);
+							input.setAttribute("type","checkbox");
+							input.setAttribute("class","nowcheck");
+							
+							label.innerText=ename;
+							div.appendChild(label);
+							div.appendChild(input);
+							
+							//add in first							
+							var firstnode=nlist.firstChild;
+							nlist.insertBefore(div,firstnode);
+							//nlist.appendChild(div);									
+						}
+						
+					});
+					
+					//tap up to remove selected employee
+					doc.getElementById('up').addEventListener('tap',function(){
+						var res=getCheckBoxRes('nowcheck');
+						
+						for(var i=0;i<res.length;i++){
+							var map=res[i];
+							var ename=map['name'];
+							var eid=map['id'];
+							
+							console.log(ename+' , '+eid);
+							var qlist=doc.getElementById('querylist');
+							var nlist=doc.getElementById('nowlist');
+							
+							//delete
+							var node=doc.getElementById(eid);
+							nlist.removeChild(node);
+							
+							//add to the list head
+							var div = doc.createElement('div');
+							var label=doc.createElement('label');
+							var input=doc.createElement('input');
+							
+							div.setAttribute("class","mui-input-row mui-checkbox mui-left");
+							div.setAttribute("id","query"+eid);
+							input.setAttribute("name",ename);
+							input.setAttribute("value",eid);
+							input.setAttribute("type","checkbox");
+							input.setAttribute("class","querycheck");
+							
+							label.innerText=ename;
+							div.appendChild(label);
+							div.appendChild(input);
+							
+							//add in first							
+							var firstnode=qlist.firstChild;
+							qlist.insertBefore(div,firstnode);
+						}
+					});													
+					
+					//cancel the modify
+					doc.getElementById('cancelbtn').addEventListener('tap',function(){						
+						location.reload();
+					});
+					
+					//save the modify result
+					doc.getElementById('savebtn').addEventListener('tap',function(){						
+						//orignal interest list
+						//final interest list
+						var  finlist=[];
+						var children=doc.getElementById('nowlist').children;
+						for(var i=0;i<children.length;i++){
+							finlist.push(children[i].id);							
+						}
+						
+						var pid=[state.pid];						
+						var fdata={
+							'pid':pid,
+							'orilist':orilist,
+							'finlist':finlist
+						};
+						
+						postData(SERVER_HOST_FORMAL + MODULE_UPDATE_INTEREST, fdata,
+							function(ret) {
+								console.log(ret);
+								if(ret=='fuwa'){
+									
+								}else if(ret=='kira'){
+									location.reload();	
+									var btnArray = ['确定'];
+									mui.confirm('修改成功', '提示', btnArray, null);
+								}								
+							},
+							null
+						);						
+					});
+					
+				});
+			})(mui, document);
+		</script>
+	</body>
+
+</html>

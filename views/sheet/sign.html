@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>sign</title>
+
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+		<link rel="stylesheet" href="../../css/mui.min.css">
+		<script src="../../js/mui.min.js"></script>
+
+		<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=gFnz6qFzCsLvFZS9GRTB4XBtlaq7BPpZ"></script>
+		<!--
+        	作者：jialegeyou1111@163.com
+        	时间：2018-12-27
+        	描述：
+        	<script type="text/javascript" src="http://api.map.baidu.com/getscript?v=2.0&ak=gFnz6qFzCsLvFZS9GRTB4XBtlaq7BPpZ"></script>
+        -->
+		<script type="text/javascript" src="http://developer.baidu.com/map/jsdemo/demo/convertor.js"></script>
+		<script type="text/javascript" src="../../js/GeoUtils.js"></script>
+		<script src="../../js/coordinate.js"></script>
+		<script src="../../js/constants.js"></script>
+		<script src="../../js/ajaxutils.js"></script>
+		<script src="../../js/serverutils.js"></script>
+		<script src="../../js/timeutils.js"></script>
+
+		<style>
+			.BMap_cpyCtrl {
+				display: none;
+			}
+			
+			.anchorBL {
+				display: none;
+			}
+			
+			.circle {
+				position: fixed;
+				text-align: center;
+				margin-left: calc((100% - 90px)/2);
+				width: 90px;
+				height: 90px;
+				border-radius: 50px;
+				background: rgba(100, 177, 245, 0.8);
+				z-index: 99;
+			}
+			
+			.checktitle {
+				font-weight: bold;
+			}
+			
+			.left {
+				width: 34%;
+				float: left;
+				clear: right;
+				height: 20px;
+			}
+			
+			.mid {
+				width: 30%;
+				float: left;
+				clear: right;
+				height: 20px;
+			}
+			
+			.right {
+				width: 18%;
+				float: left;
+				clear: right;
+				height: 20px;
+				font-size: 14px;
+				color: #1699C5;
+			}
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">地理签到</h1>
+		</header>
+
+		<div class="mui-content mui-scroll-wrapper">
+			<div class="mui-scroll">
+				<div style="padding: 5px;">
+					<div id="map" style="height: 280px"></div>
+				</div>
+
+				<div class="mui-card">
+					<div style="padding: 3px;" align="center">
+						<div id="position">地理位置检测...</div>
+						<div id="valid">验证中...</div>
+					</div>
+				</div>
+
+				<div style="padding-left: 10px;padding-top: 20px;">
+					<div class="checktitle left">上班打卡时间：</div>
+					<div id="ontime" class="mid"></div>
+					<div class="right" id="on_add_remark">添加备注</div>
+					<div class="right" id="on_query_remark">查看备注</div>
+				</div>
+
+				<div style="padding-left: 10px;padding-top: 20px;padding-bottom: 40px;">
+					<div class="checktitle left">下班打卡时间：</div>
+					<div id="offtime" class="mid"></div>
+					<div class="right" id="off_add_remark">添加备注</div>
+					<div class="right" id="off_query_remark">查看备注</div>
+				</div>
+
+				<div style="padding-top: 5px;">
+					<button type="button" class="mui-btn mui-btn-primary circle" id="signup">签到</button>
+				</div>
+
+			</div>
+		</div>
+
+		<script type="text/javascript">
+			var map = new BMap.Map("map"); // 创建地图实例  
+			var point = new BMap.Point(120.3968, 36.2789); // 创建点坐标  
+			map.centerAndZoom(point, 17); // 初始化地图，设置中心点坐标和地图级别
+
+			//定位  
+			var latitude;
+			var longitude;
+			var nowPoint;
+			var positiontype = -1;
+			var geolocation = new BMap.Geolocation();
+
+			var locstr;
+			var shortlocstr;
+
+			geolocation.getCurrentPosition(function(result) {
+				if(this.getStatus() == BMAP_STATUS_SUCCESS) {
+					var mk = new BMap.Marker(result.point); //创建一个覆盖物  
+					map.addOverlay(mk); //增加一个标示到地图上  
+					addMarker(result.point);
+					latitude = result.point.lat; //获取到的纬度  
+					longitude = result.point.lng; //获取到的经度  
+
+					console.log('Lon:' + longitude + ' , Lat:' + latitude);
+
+					nowPoint = new BMap.Point(longitude, latitude);
+					map.centerAndZoom(nowPoint, 17); //重新初始化地图					
+
+					//culculate distance
+					var zhPoint = new BMap.Point(zh_longitude, zh_latitude);
+					var bgPoint = new BMap.Point(bg_longitude, bg_latitude);
+					var zhbPoint = new BMap.Point(zhb_longtitude, zhb_latitude);
+					var itcPoint = new BMap.Point(itc_longtitude, itc_latitude);
+					var a3Point = new BMap.Point(a3_longtitude, a3_latitude);
+					var jtPoint = new BMap.Point(jt_longtitude, jt_latitude);
+					var hzPoint = new BMap.Point(ta_longtitude, ta_latitude);
+
+					//var distance = map.getDistance(nowPoint, zhPoint);
+					//console.log('Dis: ' + distance);
+					//document.getElementById('valid').innerHTML=longitude+' , '+latitude +'\r\n'+distance;
+
+					if(map.getDistance(nowPoint, zhPoint) <= CENTER_DISTANCE) { //综合楼
+						document.getElementById('valid').innerHTML = '位于签到范围内，可以签到';
+						positiontype = 1;
+					} else if(map.getDistance(nowPoint, bgPoint) <= CENTER_DISTANCE) { //办公楼
+						document.getElementById('valid').innerHTML = '位于签到范围内，可以签到';
+						positiontype = 3;
+					} else if(map.getDistance(nowPoint, hzPoint) <= TA_CENTER_DISTANCE) { //航站楼
+						document.getElementById('valid').innerHTML = '位于签到范围内，可以签到';
+						positiontype = 5;
+					} else if(map.getDistance(nowPoint, zhbPoint) <= CENTER_DISTANCE) { //胶东机场建设指挥部
+						document.getElementById('valid').innerHTML = '位于签到范围内，可以签到';
+						positiontype = 6;
+					} else if(map.getDistance(nowPoint, itcPoint) <= CENTER_DISTANCE) { //itc
+						document.getElementById('valid').innerHTML = '位于签到范围内，可以签到';
+						positiontype = 7;
+					} else if(map.getDistance(nowPoint, a3Point) <= JD_CENTER_DISTANCE) { //a3
+						document.getElementById('valid').innerHTML = '位于签到范围内，可以签到';
+						positiontype = 8;
+					} else if(map.getDistance(nowPoint, jtPoint) <= JD_CENTER_DISTANCE) { //胶东机场航站楼
+						document.getElementById('valid').innerHTML = '位于签到范围内，可以签到';
+						positiontype = 9;
+					} else {
+						document.getElementById('valid').innerHTML = '位于签到范围外，不可以签到';
+						//改变按钮css
+						var sbtn = document.getElementById('signup');
+						sbtn.style.setProperty('background', '#EE9A49');
+						sbtn.innerHTML = '外勤签到';
+					}
+
+					//document.getElementById('valid').innerHTML='位于签到范围外，不可以签到';
+
+					var gc = new BMap.Geocoder(); //初始化，Geocoder类
+					gc.getLocation(nowPoint, function(rs) { //getLocation函数用来解析地址信息，分别返回省市区街等
+						var addComp = rs.addressComponents;
+						province = addComp.province; //获取省份
+						city = addComp.city; //获取城市
+						district = addComp.district; //区
+						street = addComp.street; //街
+						streetNumber = addComp.streetNumber;
+
+						//非胶东机场建设指挥部显示路名
+						locstr = province + city + district + street + streetNumber;
+						shortlocstr = district + street + streetNumber;
+						document.getElementById('position').innerHTML = '当前位置:' + province + city + district + street + streetNumber;
+
+						if(positiontype == 7) {
+							document.getElementById('position').innerHTML = '当前位置:胶东机场ITC';
+						} else if(positiontype == 8) {
+							document.getElementById('position').innerHTML = '当前位置:胶东机场A3地块';
+						} else if(positiontype == 9) {
+							document.getElementById('position').innerHTML = '当前位置:胶东机场航站楼';
+						} else if(positiontype == 5) {
+							document.getElementById('position').innerHTML = '当前位置:航站区';
+						}
+					});
+				}
+			});
+
+			function addMarker(point) { // 创建图标对象     
+				var myIcon = new BMap.Icon("../../img/headman.png", new BMap.Size(72, 72), {
+					offset: new BMap.Size(10, 25)
+				});
+				// 创建标注对象并添加到地图     
+				var marker = new BMap.Marker(point, {
+					icon: myIcon
+				});
+				map.addOverlay(marker);
+			}
+
+			var state = constants.getState();
+
+			(function($, doc) {
+				$.init();
+
+				//not used
+				//				mui('.mui-scroll-wrapper').scroll({
+				//					bounce: false, 
+				//					deceleration: 0.0005,
+				//					indicators: true
+				//				});
+
+				$.ready(function() {
+					var nowdate = new Date();
+					var data = {
+						'id': state.pid,
+						'date': nowdate.Format("yyyy-MM-dd")
+					};
+
+					var timemap;
+					postData(SERVER_HOST_FORMAL + MODULE_ON_OFF_RECORD, data,
+						function(ret) {
+							//console.log(ret);
+							var map = JSON.parse(ret);
+							timemap = map;
+
+							var count = map['rcdnum'];
+							//console.log(count);
+
+							if(count == 0) {
+								document.getElementById('ontime').innerHTML = '暂未打卡';
+								document.getElementById('offtime').innerHTML = '暂未打卡';
+							} else if(count == 1) {
+								document.getElementById('ontime').innerHTML = map['start'];
+								document.getElementById('offtime').innerHTML = '暂未打卡';
+							} else {
+								document.getElementById('ontime').innerHTML = map['start'];
+								document.getElementById('offtime').innerHTML = map['end'];
+							}
+
+						},
+						null
+					);
+
+					//签到添加备注
+					//需要查询是否已有备注，如果存在不允许重复提交，进行修改
+					document.getElementById('on_add_remark').addEventListener('tap', function() {
+						addremarks('on');
+					});
+					//签到查看备注
+					document.getElementById('on_query_remark').addEventListener('tap', function() {
+						queryremarks('on');
+					});
+					//签退添加备注
+					document.getElementById('off_add_remark').addEventListener('tap', function() {
+						addremarks('off');
+					});
+					//签退查看备注
+					document.getElementById('off_query_remark').addEventListener('tap', function() {
+						queryremarks('off');
+					});
+
+					//					document.getElementById('outcheck').addEventListener('tap',function(){
+					//						outcheck();
+					//					});
+
+					function addremarks(type) {
+						var data = {
+							'pid': state.pid,
+							'date': nowdate.Format("yyyy-MM-dd"),
+							'type': type
+						};
+
+						var inputloc = '';
+						var remark = '';
+						var num = '';
+
+						postData(SERVER_HOST_FORMAL + MODULE_GET_RECORD_REMARK, data,
+							function(ret) {
+								var map = JSON.parse(ret);
+								var btnArray = ['确定'];
+								var str = '';
+
+								//无历史消息
+								if(map['num'] == '0') {
+									num = '0';
+									openAddRemark(type, num, inputloc, remark);
+								} else { //有历史消息
+									var btnArray = ['取消', '确认'];
+									mui.confirm('当前已存在记录，是否修改', '提示', btnArray, function(e) {
+										if(e.index == 1) {
+											num = '1';
+											inputloc = map['inloc'];
+											remark = map['remark'];
+											openAddRemark(type, num, inputloc, remark);
+										}
+									})
+
+								}
+							},
+							null
+						);
+					}
+
+					function openAddRemark(type, num, inputloc, remark) {
+						var time;
+						if(type == 'on') {
+							time = timemap['start'];
+						} else if(type == 'off') {
+							time = timemap['end'];
+						}
+
+						mui.openWindow({
+							url: '../subviews/add-remark.html',
+							id: 'add-remark.html',
+							show: {
+								autoShow: true,
+								aniShow: "slide-in-right",
+								duration: '250'
+							},
+							extras: {
+								loc: locstr,
+								type: type,
+								pid: state.pid,
+								date: nowdate.Format("yyyy-MM-dd"),
+								tmap: time,
+								num: num,
+								inputloc: inputloc,
+								remark: remark
+							},
+							waiting: {
+								autoShow: false,
+							}
+						});
+					}
+
+					function queryremarks(type) {
+						var data = {
+							'pid': state.pid,
+							'date': nowdate.Format("yyyy-MM-dd"),
+							'type': type
+						};
+						postData(SERVER_HOST_FORMAL + MODULE_GET_RECORD_REMARK, data,
+							function(ret) {
+								var map = JSON.parse(ret);
+								var btnArray = ['确定'];
+								var str = '';
+
+								if(map['num'] == '0') {
+									str += '未添加备注 ';
+								} else {
+									str += '系统定位:  ' + map['sysloc'] + '\r\n';
+									str += '输入位置:  ' + map['inloc'] + '\r\n';
+									str += '备注信息:  ' + map['remark'] + '\r\n';
+								}
+								mui.confirm(str, '详细信息', btnArray, null);
+							},
+							null
+						);
+					}
+
+					function outcheck(location, time) {
+						mui.openWindow({
+							url: '../subviews/outcheck.html',
+							id: 'outcheck.html',
+							show: {
+								autoShow: true,
+								aniShow: "slide-in-right",
+								duration: '250'
+							},
+							extras: {
+								loc: location,
+								time: time,
+								pid: state.pid,
+								name: state.account
+							},
+							waiting: {
+								autoShow: false,
+							}
+						});
+					}
+
+					document.getElementById('signup').addEventListener('tap', function(e) {
+						var sdata = {
+							'id': state.pid,
+							'name': state.account,
+							'position': positiontype
+						};
+
+						var btnArray = ['确定'];
+						var outBtnArray = ['取消', '确定'];
+						if(positiontype == -1) {
+
+							mui.confirm('位于签到范围外，是否外勤签到!', '提示', outBtnArray, function(e) {
+								if(e.index == 0) {
+									return;
+								} else if(e.index == 1) { //外勤									
+									outcheck(locstr, nowdate.Format("hh:mm:ss"));
+								}
+							});
+						} else {
+							//异常检测
+							if(nowdate.Format("hh:mm:ss") >= '08:31:00' && nowdate.Format("hh:mm:ss") < '16:00:00') {
+								//console.log(nowdate.Format("hh:mm:ss"));
+								//迟到、早退区分
+								//监测是否当天第一次打卡，如果是标明早退，type=on
+								//否则早退，type=off
+								var marktype;
+								var promttitle;
+								var checkdata = {
+									'id': state.pid,
+									'date': nowdate.Format("yyyy-MM-dd")
+								}
+								postData(SERVER_HOST_FORMAL + MODULE_CHECK_HAS_RECORD, checkdata,
+									function(ret) {
+										//console.log(ret);
+										if(ret == '0') {
+											marktype = 'on';
+											promttitle = '提示:迟到打卡';
+										} else {
+											marktype = 'off';
+											promttitle = '提示:早退打卡';
+										}
+
+										//异常提示输入框
+										var btnArray2 = ['取消', '确定打卡'];
+										var s = '打卡地点 : ' + shortlocstr + '\r\n打卡时间 : ' + nowdate.Format("hh:mm:ss") + '\r\n请填写打卡备注(选填):';
+										mui.prompt(s, '可填', promttitle, btnArray2, function(event) {
+											//								if(event.index == 0) { //取消
+											//								} else 
+											if(event.index == 1) {
+												//console.log(event.value);
+
+												//先打卡，再写备注
+												postData(SERVER_HOST_FORMAL + MODULE_SIGN, sdata,
+													function(ret) {
+														if(ret > 0) {
+															mui.confirm('签到成功!', '提示', btnArray, null);
+															var redata = {
+																'id': state.pid,
+																'date': nowdate.Format("yyyy-MM-dd")
+															};
+															postData(SERVER_HOST_FORMAL + MODULE_ON_OFF_RECORD, redata,
+																function(ret) {
+																	var map = JSON.parse(ret);
+																	timemap = map;
+
+																	var count = map['rcdnum'];
+
+																	if(count == 0) {
+																		document.getElementById('ontime').innerHTML = '暂未打卡';
+																		document.getElementById('offtime').innerHTML = '暂未打卡';
+																	} else if(count == 1) {
+																		document.getElementById('ontime').innerHTML = map['start'];
+																		document.getElementById('offtime').innerHTML = '暂未打卡';
+																	} else {
+																		document.getElementById('ontime').innerHTML = map['start'];
+																		document.getElementById('offtime').innerHTML = map['end'];
+																	}
+
+																},
+																null
+															);
+														} else {
+															mui.confirm('签到失败，请稍后重试!', '提示', btnArray, null);
+														}
+													},
+													null
+												);
+
+												//写备注，看备注是否为空，空则不写
+												if(event.value != '') {
+													var datass = {
+														'pid': state.pid,
+														'date': nowdate.Format("yyyy-MM-dd"),
+														'type': marktype
+													};
+													postData(SERVER_HOST_FORMAL + MODULE_GET_RECORD_REMARK, datass,
+														function(ret) {
+															//console.log(ret);
+															var map = JSON.parse(ret);
+															var data3 = {
+																'pid': state.pid,
+																'date': nowdate.Format("yyyy-MM-dd"),
+																'type': marktype,
+																'sysloc': shortlocstr,
+																'inputloc': '',
+																'remark': event.value
+															};
+															//无历史消息
+															if(map['num'] == '0') {
+																postData(SERVER_HOST_FORMAL + MODULE_ADD_RECORD_REMARK, data3,
+																	function(ret) {}, null);
+															} else { //有历史消息
+																postData(SERVER_HOST_FORMAL + MODULE_UPDATE_RECORD_REMARK, data3,
+																	function(ret) {}, null);
+															}
+														},
+														null
+													);
+												}
+											}
+										}, 'div');
+
+									},
+									null
+								);
+
+							} else { //正常打卡
+								postData(SERVER_HOST_FORMAL + MODULE_SIGN, sdata,
+									function(ret) {
+										if(ret > 0) {
+											mui.confirm('签到成功!', '提示', btnArray, null);
+											var redata = {
+												'id': state.pid,
+												'date': nowdate.Format("yyyy-MM-dd")
+											};
+											postData(SERVER_HOST_FORMAL + MODULE_ON_OFF_RECORD, redata,
+												function(ret) {
+													var map = JSON.parse(ret);
+													timemap = map;
+
+													var count = map['rcdnum'];
+
+													if(count == 0) {
+														document.getElementById('ontime').innerHTML = '暂未打卡';
+														document.getElementById('offtime').innerHTML = '暂未打卡';
+													} else if(count == 1) {
+														document.getElementById('ontime').innerHTML = map['start'];
+														document.getElementById('offtime').innerHTML = '暂未打卡';
+													} else {
+														document.getElementById('ontime').innerHTML = map['start'];
+														document.getElementById('offtime').innerHTML = map['end'];
+													}
+												},
+												null
+											);
+										} else {
+											mui.confirm('签到失败，请稍后重试!', '提示', btnArray, null);
+										}
+									},
+									null
+								);
+							}
+
+						}
+
+					});
+
+					//$(".mui-scroll-wrapper").scroll({}); 
+					//					$('#scroll').scroll({
+					//					indicators: true 
+					//					});
+
+				}); //ready
+			})(mui, document);
+		</script>
+	</body>
+
+</html>

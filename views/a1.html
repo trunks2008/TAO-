@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>TAO+</title>
+
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+		<link rel="stylesheet" href="../css/mui.min.css">
+
+		<script src="../js/mui.min.js"></script>
+		<script src="../js/constants.js"></script>
+		<script src="../js/serverutils.js"></script>
+		<script src="../js/ajaxutils.js"></script>
+		<script src="../js/timeutils.js"></script>
+		<script src="../js/top-mobile-update-util.js"></script>
+		
+		<style>			
+			.coverImg{
+			    object-fit: cover
+			}
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<h1 class="mui-title">tao+</h1>
+		</header>
+
+		<div class="mui-content">
+
+			<div id="slider" class="mui-slider">
+				<div class="mui-slider-group mui-slider-loop">
+					<!-- 额外增加的一个节点(循环轮播：第一个节点是最后一张轮播) -->
+					<div class="mui-slider-item mui-slider-item-duplicate">
+						<a href="#"> 
+							<img src="../img/s4.png">
+						</a>
+					</div>
+					<div class="mui-slider-item">
+						<a href="#"><img src="../img/s1.png" /></a>
+					</div>
+					<div class="mui-slider-item">
+						<a href="#"><img src="../img/s2.png" /></a>
+					</div>
+					<div class="mui-slider-item">
+						<a href="#"><img src="../img/s3.png" /></a>
+					</div>
+					<div class="mui-slider-item">
+						<a href="#"><img src="../img/s4.png" /></a>
+					</div>
+					<!-- 额外增加的一个节点(循环轮播：最后一个节点是第一张轮播) -->
+					<div class="mui-slider-item mui-slider-item-duplicate">
+						<a href="#">
+							<img src="../img/s1.png">
+						</a>
+					</div>
+				</div>
+
+				<div class="mui-slider-indicator">
+					<div class="mui-indicator mui-active"></div>
+					<div class="mui-indicator"></div>
+					<div class="mui-indicator"></div>
+					<div class="mui-indicator"></div>
+				</div>
+			</div>  
+  
+			<ul class="mui-table-view mui-grid-view mui-grid-9" id="homeMenu">
+				<li class="mui-table-view-cell mui-media mui-col-xs-3 mui-col-sm-3" id="today">
+					<a href="">
+						<img src="../img/concept-sm.png" height="60" weight="60" />
+						<div class="mui-media-body" style="font-size: 12px;">今日概览</div>
+					</a>
+				</li>
+				<li class="mui-table-view-cell mui-media mui-col-xs-3 mui-col-sm-3" id="daily">
+					<a href="">
+						<img src="../img/static-sm.png" height="60" weight="60" class="coverImg"/>
+						<div class="mui-media-body" style="font-size: 12px;">每日统计</div>
+					</a> 
+				</li>
+				<li class="mui-table-view-cell mui-media mui-col-xs-3 mui-col-sm-3" id="quota">
+					<a href="">
+						<img src="../img/quota-sm.png" height="60" weight="60" class="coverImg" />
+						<div class="mui-media-body" style="font-size: 12px;">机场运行</div>
+					</a>
+				</li>
+				<li class="mui-table-view-cell mui-media mui-col-xs-3 mui-col-sm-3" id="person">
+					<a href="">
+						<img src="../img/person-sm.png" height="60" weight="60"  class="coverImg"/>
+						<div class="mui-media-body" style="font-size: 12px;">个人出勤</div>
+					</a>
+				</li>
+				<li class="mui-table-view-cell mui-media mui-col-xs-3 mui-col-sm-3" id="sign">
+					<a href="">
+						<img src="../img/sign-sm.png" height="60" weight="60" />
+						<div class="mui-media-body" style="font-size: 12px;">出勤签到</div>
+					</a>
+				</li>
+				<li class="mui-table-view-cell mui-media mui-col-xs-3 mui-col-sm-3" id="dept-collapses">
+					<a href="">
+						<img src="../img/dept-sm.png" height="60" weight="60" />
+						<div class="mui-media-body" style="font-size: 12px;">部门统计</div>
+					</a>
+				</li> 
+				<li class="mui-table-view-cell mui-media mui-col-xs-3 mui-col-sm-3" id="worklog">
+					<a href="">
+						<img src="../img/log-sm.png" height="60" weight="60" />
+						<div class="mui-media-body" style="font-size: 12px;">工作日志</div>
+					</a>
+				</li>
+				<li class="mui-table-view-cell mui-media mui-col-xs-3 mui-col-sm-3" id="interest">
+					<a href="">
+						<img src="../img/interest-sm.png" height="60" weight="60" />
+						<div class="mui-media-body" style="font-size: 12px;">我的关注</div>
+					</a>
+				</li>
+				<li class="mui-table-view-cell mui-media mui-col-xs-3 mui-col-sm-3" id="group">
+					<a href="">
+						<img src="../img/group-sm.png" height="60" weight="60" />
+						<div class="mui-media-body" style="font-size: 12px;">固定群组</div>
+					</a>
+				</li>
+				<li class="mui-table-view-cell mui-media mui-col-xs-3 mui-col-sm-3" id="excel">
+					<a href="">
+						<img src="../img/excel-sm.png" height="60" weight="60" />
+						<div class="mui-media-body" style="font-size: 12px;">报表下载</div>
+					</a>
+				</li>
+				<li class="mui-table-view-cell mui-media mui-col-xs-3 mui-col-sm-3" id="chatai">
+					<a href="">
+						<img src="../img/chat-sm.png" height="60" weight="60" />
+						<div class="mui-media-body" style="font-size: 12px;">智能查询</div>
+					</a>
+				</li>
+				
+				<!--<li class="mui-table-view-cell mui-media mui-col-xs-3 mui-col-sm-3" id="sign2">
+					<a href="">
+						<img src="../img/sign-sm.png" height="60" weight="60" />
+						<div class="mui-media-body" style="font-size: 12px;">出勤签到2</div>
+					</a>
+				</li>-->
+				
+				<li class="mui-table-view-cell mui-media mui-col-xs-3 mui-col-sm-3" id="inspect">
+					<a href="">
+						<img src="../img/inspect-sm.png" height="60" weight="60" />
+						<div class="mui-media-body" style="font-size: 12px;">值班巡视</div>
+					</a>
+				</li>
+				
+			</ul>
+		</div>
+
+		<script>
+			mui.init({});
+
+			var slider = mui("#slider");
+			slider.slider({
+				interval: 5000
+			});
+
+			mui.plusReady(function() {
+				var state = constants.getState();
+				var p_name = state.account;
+				var p_id = state.pid;
+
+				//检测更新
+				postData(SERVER_HOST_FORMAL + MODULE_CHECK_MOBILE_VERSION, {},
+					function(ret) {
+						plus.runtime.getProperty(plus.runtime.appid, function(inf) {
+							currentVersion = inf.version;
+							checkUpdate(ret, currentVersion);
+						});
+					}, null
+				);
+
+				function checkUpdate(ret, curVer) {
+					data = JSON.parse(ret);
+					//					console.log(ret);
+					//					console.log('Cur:  '+curVer);
+					if(data) {
+						if(curVer && data['ver'] && (curVer != data['ver'])) {
+							var downloadUrl = SERVER_HOST_FORMAL + data['path'];
+							console.log('Update ' + curVer + ' to ' + data['ver']);
+							console.log(downloadUrl);
+							topUpdateUtil.downloadUpdateFileOnMain(downloadUrl);
+						}
+					}
+				}
+
+				mui("#homeMenu").on('tap', '.mui-table-view-cell', function() {
+					var resourceId = this.getAttribute("id");
+					if(resourceId == "") {
+						return;
+					}
+
+					if(resourceId == "dept-collapses") {
+						var pdata = {
+							'pid': p_id
+						};
+						postData(SERVER_HOST_FORMAL + MODULE_CHECK_DEPT_AUTHORITY, pdata,
+							function(ret) {
+								//console.log(ret);
+								var amap = JSON.parse(ret);
+
+								//只有本部门权限
+								if(amap['authority'] == '0') {
+									//console.log(amap['isparent']);
+									if(amap['isparent'] == 'true') { //有父部门
+										mui.openWindow({
+											url: 'subviews/dept-level1.html',
+											id: 'dept-level1.html',
+											show: {
+												autoShow: true,
+												aniShow: "slide-in-right",
+												duration: '250'
+											},
+											extras: {
+												p_id: amap['deptid'],
+												d_name: amap['deptname']
+											},
+											waiting: {
+												autoShow: false,
+											}
+										});
+									} else if(amap['isparent'] == 'false') { //无父部门
+										var nowdate = new Date();
+										nowdate.setDate(nowdate.getDate());
+										var datestr = nowdate.Format("yyyy-MM-dd");
+										var data = {
+											d_id: amap['deptid'],
+											date: datestr
+										};
+
+										postData(SERVER_HOST_FORMAL + MODULE_ALLDEPT_RECORD, data,
+											function(ret) {
+												console.log(ret);
+												var bmap = JSON.parse(ret);
+
+												mui.openWindow({
+													url: 'subviews/dept-detail.html',
+													id: 'dept-detail.html',
+													show: {
+														autoShow: true,
+														aniShow: "slide-in-right",
+														duration: '250'
+													},
+													extras: {
+														p_id: amap['deptid'],
+														d_name: amap['deptname'],
+														memcount: bmap['dept_member'],
+														ncount: bmap['check_member']
+													},
+													waiting: {
+														autoShow: false,
+													}
+												});
+
+											},
+											null
+										);
+									}
+
+								} else if(amap['authority'] == '1') { //administrator权限
+									mui.openWindow({
+										url: 'sheet/dept-collapses.html',
+										id: 'dept-collapses.html',
+										show: {
+											autoShow: true,
+											aniShow: "slide-in-right",
+											duration: '250'
+										},
+										extras: {
+											p_name: p_name,
+											p_id: p_id
+										},
+										waiting: {
+											autoShow: false,
+										}
+									});
+
+								}
+							},
+							null
+						);
+
+					} else {
+						var url = 'sheet/' + resourceId + ".html";
+						var id = url.substring(url.lastIndexOf('/') + 1);
+
+						mui.openWindow({
+							url: url,
+							id: id,
+							show: {
+								autoShow: true,
+								aniShow: "slide-in-right",
+								duration: '250'
+							},
+							extras: {
+								p_name: p_name,
+								p_id: p_id
+							},
+							waiting: {
+								autoShow: false,
+							}
+						});
+					}
+
+				});
+			});
+
+			//主页点击两次退出
+			var backButtonPress = 0;
+			mui.back = function(event) {
+				backButtonPress++;
+				if(backButtonPress > 1) {
+					plus.runtime.quit();
+				} else {
+					plus.nativeUI.toast('再按一次退出应用');
+				}
+				setTimeout(function() {
+					backButtonPress = 0;
+				}, 1000);
+				return false;
+			};
+		</script>
+
+	</body>
+
+</html>

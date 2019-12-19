@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>dept</title>
+
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+		<script src="../../js/mui.min.js"></script>
+		<script src="../../js/serverutils.js"></script>
+		<script src="../../js/ajaxutils.js"></script>
+		<script src="../../js/mui.picker.js"></script>
+		<script src="../../js/mui.poppicker.js"></script>
+		<script src="../../js/timeutils.js"></script>
+		<script src="../../js/mui.picker.min.js"></script>
+		<script src="../../js/echarts.min.js" ></script>
+
+		<link rel="stylesheet" href="../../css/mui.min.css">
+		<link rel="stylesheet" href="../../css/mui.picker.min.css" />
+		<link rel="stylesheet" href="../../css/mui.poppicker.css" />
+		<link rel="stylesheet" href="../../css/my.css" />
+		<link rel="stylesheet" href="../../css/mytable.css" />
+
+		<style>
+			.timebtn {
+				font-size: 14px;
+				padding: 4px;
+				margin: 3px;
+			}
+			
+			.deptbtn{
+				font-size: 16px;
+				padding: 8px;
+				margin: 3px;
+				margin-left: 3px;
+				margin-right: 0px;
+				padding-left: 10px;
+			}
+			
+			.timechart{
+				margin-top: 10px;
+				width: 350px;
+				height:300px;
+			}	
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">部门统计</h1>
+		</header>
+
+		<div class="mui-content">
+			<!--            	
+            <div>
+				<span class="ptextcenter"  sytle="font-size:14px">起始日期</span>
+				<button id="start" class="btn mui-btn checkbtn ">选择时间 </button>
+				<span class="ptextcenter"  sytle="font-size:14px">结束日期</span>
+				<button id="end" class="btn mui-btn checkbtn ">选择时间 </button>			
+			</div>
+			
+			<div>
+				<button id="deptPicker" class="mui-btn deptbtn" style="width:250px" type="button">选择部门</button>
+				<button id="query" class="btn mui-btn mui-btn-blue checkbtn" style="float: right;margin-right: 10px;">查询</button>
+			</div>		
+            -->
+			
+			<div>
+				<span class="ptextcenter"  sytle="font-size:14px">部门选择:</span>
+				<button id="deptPicker" class="mui-btn deptbtn" style="width:250px" type="button">请点击选择部门</button>				
+			</div>
+			<div>
+				<span class="ptextcenter"  sytle="font-size:14px">起始日期:</span>
+				<button id="start" class="btn mui-btn checkbtn" style="margin-left: 3px;">选择时间 </button>			
+				<button id="query" class="btn mui-btn mui-btn-blue checkbtn" style="float: right;margin-right: 10px;">查询</button>
+			</div>
+			
+			<table width="98%" class="table" id="tablevalue">
+	            <tr><th width=30%>人员</th><th width=34%>签到时间</th><th width=34%>签退时间</th>
+	            </tr>	         
+	        </table>
+	        
+	        <div id="chart" class='timechart'></div>
+		</div>
+		
+		<script>
+			(function($, doc) {
+				$.init();
+				$.ready(function() {
+					var nowdate = new Date();
+					nowdate.setDate(nowdate.getDate()-1);
+					doc.getElementById('start').innerHTML=nowdate.Format("yyyy-MM-dd");	
+					
+					doc.getElementById('start').addEventListener('tap', function() {
+						var dtPicker = new mui.DtPicker({　　　　
+							"type": "date"
+						});
+						dtPicker.show(function(rs){
+							doc.getElementById('start').innerHTML=rs.text;									
+						});　
+					})
+		
+					var data = {};
+					var idl1='null';
+					var idl2='null';
+					postData(SERVER_HOST_FORMAL + MODULE_DEPT, data,
+						function(ret) {
+							var deptdata= JSON.parse(ret);		
+							
+							//级联示例
+							var deptPicker = new $.PopPicker({
+								layer: 2
+							});
+							deptPicker.setData(deptdata);
+							var showDeptPickerButton = doc.getElementById('deptPicker');
+		
+							showDeptPickerButton.addEventListener('tap', function(event) {
+								deptPicker.show(function(items) {
+									idl1=items[0].value;
+									//return false; 返回 false 可以阻止选择框的关闭					
+									if(items[1].text==undefined){
+										items[1].text='';
+									}else{
+										idl2=items[1].value;
+									}
+									showDeptPickerButton.innerHTML=items[0].text+" "+items[1].text;
+								});
+							}, false);
+						},
+						null
+					);
+					
+					doc.getElementById('query').addEventListener('tap',function(){
+						var stvalue=document.getElementById('start').innerHTML;
+						
+						if(idl1=='null'){
+							plus.nativeUI.toast('请选择部门！');
+							return;
+						}
+						
+						var data={
+							'start':stvalue,
+							'deptl1':idl1,
+							'deptl2':idl2
+						};
+						
+						postData(SERVER_HOST_FORMAL + MODULE_DEPTRECORD, data,
+							function(ret) {
+//								console.log(ret);
+								var objTable = document.getElementById("tablevalue");	
+								var len=objTable.rows.length;				
+								if(len > 1){			    	
+						        	for(var i=len-1;i>0;i--) 
+						          	{ 		
+						            	document.getElementById("tablevalue").deleteRow(1);		            	
+						          	} 
+						        }
+							
+								var cate=[];
+								var hours=[];
+								var list = JSON.parse(ret);
+								for(var i=0;i<list.length;i++){
+									var att=list[i];
+									var tr=document.createElement('tr');
+									tr.id=att.id;
+									
+									var tdname=document.createElement('td');
+									var tdstime=document.createElement('td');
+									var tdetime=document.createElement('td');										
+									
+									tdname.innerHTML=att.name;
+									tdstime.innerHTML=att.begTime;
+									tdetime.innerHTML=att.endTime;									
+									
+									cate.unshift(att.name);
+									var diff=TimeDiff(att.endTime,att.begTime);
+									hours.unshift(diff);
+									
+									if(att.begTime>'08:30:00'){
+										tdstime.style.color="Red";
+									}
+									
+									if(att.endTime<'16:00:00'){
+										tdetime.style.color="red";
+									}
+									
+									tr.appendChild(tdname);
+									tr.appendChild(tdstime);
+									tr.appendChild(tdetime);
+									
+									objTable.appendChild(tr);	
+								}
+								
+								//draw chart
+								var myChart = echarts.init(document.getElementById('chart'));
+								var option = {
+								    title: {
+								        text: '工作时长'
+								    },
+								    tooltip: {},
+								    legend: {
+								        data:['小时']
+								    },
+								    xAxis: {
+								    	type:'category',
+								        data: cate,
+								        axisLabel : {
+											interval : 0,
+											rotate : 40
+										}
+								    },
+								    yAxis:{
+								    	 type: 'value'						    	 
+								    },
+								    series: [{
+								        name: '小时',
+								        type: 'bar',
+								        data: hours,
+								        itemStyle: { 
+					                        normal: {
+					                        	color:'#5CACEE',
+					                            label: {
+					                                show: true,//是否展示  
+					                                textStyle: {  
+					                                    fontWeight:'bolder',  
+					                                    fontSize : '12',  
+					                                    fontFamily : '微软雅黑',                                      
+					                                }  
+					                            }  
+					                        }
+					                    },
+					                    areaStyle: {normal: {
+					                    	color:"#28a5fc"
+					                    }}
+								    }]
+								};
+								myChart.setOption(option);													
+								
+							},
+							null
+						);
+					});
+				
+					//点人下钻
+					mui('#tablevalue').on('tap','td',function(e){
+						var row=this.parentNode;
+						var index=this.cellIndex;				
+						var p_id=row.id;
+						var p_name=row.cells[0].innerHTML;
+						
+						mui.openWindow({
+							url:'person.html',
+							id:'info.html',
+							show:{
+						      autoShow:true,//页面loaded事件发生后自动显示
+						      aniShow:"slide-in-right",
+						      duration:'250'
+						    },
+						    extras:{
+						      p_name:p_name,
+						      p_id:p_id
+						    },
+						    waiting:{
+						      autoShow:false,//自动显示等待框，默认为true
+					      	}
+						});
+					
+					});
+					
+				});
+			})(mui, document);
+			
+		</script>
+	</body>
+
+</html>

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>daily</title>
+
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+		<link rel="stylesheet" href="../../css/mui.min.css">
+		<script src="../../js/mui.min.js"></script>
+
+		<link rel="stylesheet" href="../../css/mui.picker.min.css" />
+		<script src="../../js/mui.picker.min.js"></script>
+
+		<link rel="stylesheet" href="../../css/my.css" />
+		<script src="../../js/timeutils.js"></script>
+		<script src="../../js/serverutils.js"></script>
+		<script src="../../js/ajaxutils.js"></script>
+		
+		<style>
+            .table {
+            	margin-left:5px;
+            	margin-right:5px;            
+				margin-top:2px;
+				margin-bottom:2px;
+              	border: 1px solid #cad9ea;
+                color: #666;
+            }
+
+            .table th {
+                background-repeat: repeat-x;
+                height: 30px;
+                font-size: 12px;
+            }
+
+            .table td,.table th {
+                border: 1px solid #cad9ea;
+                padding: 0 1em 0;
+            }
+            
+            .table th {
+				background: #D1EEEE;                        
+            }
+            
+            .table td{
+            	font-size: 12px;	
+            	background: #FFFFFF;
+            	text-align: center;
+            }
+            
+            .table tr.alter {
+                background-color: #f5fafe;
+            }
+    	</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">每日统计</h1>
+		</header>
+
+		<div class="mui-content">
+			<div>
+				<span class="ptextcenter">起始日期</span>
+				<button id="start" class="btn mui-btn checkbtn">选择时间 </button>
+			</div>
+			<div>
+				<span class="ptextcenter">结束日期</span>
+				<button id="end" class="btn mui-btn checkbtn">选择时间 </button>
+				<button id="query" class="btn mui-btn mui-btn-blue checkbtn" style="float: right;margin-right: 10px;">查询</button>
+			</div>
+			
+		    <table width="98%" class="table" id="tablevalue">
+	            <tr><th width=20%>人员</th><th width=30%>日期</th><th width=24%>签到时间</th><th width=24%>签退时间</th>
+	            </tr>	         
+	        </table>
+		</div>
+	
+		<script type="text/javascript">
+			mui.init();　
+
+			var nowdate = new Date().Format("yyyy-MM-dd");
+			document.getElementById('start').innerHTML=nowdate;	
+			document.getElementById('end').innerHTML=nowdate;	
+
+			document.getElementById('start').addEventListener('tap', function() {
+				var dtPicker = new mui.DtPicker({　　　　
+					"type": "date"
+				});
+				dtPicker.show(function(rs){
+					document.getElementById('start').innerHTML=rs.text;									
+				});　
+			})
+
+			document.getElementById('end').addEventListener('tap', function() {
+				var dtPicker = new mui.DtPicker({　　　　
+					"type": "date"
+				});　　
+				dtPicker.show(function(rs){
+					document.getElementById('end').innerHTML=rs.text;
+				});　
+			})
+			
+			document.getElementById('query').addEventListener('tap',function () {				
+				var stvalue=document.getElementById('start').innerHTML;
+				var edvalue=document.getElementById('end').innerHTML;
+		
+				var data={
+					'start':stvalue,
+					'end':edvalue
+				};
+				
+				postData(SERVER_HOST_FORMAL+MODULE_DAILY,data,
+					function(data){						
+						dataHandle(data);										
+					},
+					null
+				);
+			})
+			
+			function dataHandle(data){			
+				//table				
+				var objTable = document.getElementById("tablevalue");		
+				
+				//clean before insert new data
+				var len=objTable.rows.length;				
+				if(len > 1){			    	
+		        	for(var i=len-1;i>0;i--) 
+		          	{ 		
+		            	document.getElementById("tablevalue").deleteRow(1);		            	
+		          	} 
+		        }
+			
+				var map = JSON.parse(data);
+				for(var key in map){
+					var att=map[key];	
+					
+					var tr=document.createElement('tr');
+					tr.id=att.id;
+					
+					var tdname=document.createElement('td');
+					var tddate=document.createElement('td');
+					var tdstime=document.createElement('td');
+					var tdetime=document.createElement('td');										
+					
+					tdname.innerHTML=att.name;
+					tddate.innerHTML=att.date;
+					tdstime.innerHTML=att.begTime;
+					tdetime.innerHTML=att.endTime;									
+					
+					if(att.begTime>'08:30:00'){
+						tdstime.style.color="Red";
+					}
+					
+					if(att.endTime<'16:00:00'){
+						tdetime.style.color="red";
+					}
+					
+					tr.appendChild(tdname);
+					tr.appendChild(tddate);
+					tr.appendChild(tdstime);
+					tr.appendChild(tdetime);
+					
+					objTable.appendChild(tr);	
+				}				
+			}			
+			
+			mui('#tablevalue').on('tap','td',function(e){							
+				var row=this.parentNode;
+				var index=this.cellIndex;				
+				var p_id=row.id;
+				var p_name=row.cells[0].innerHTML;
+				var p_date=row.cells[1].innerHTML;				
+				//console.log(p_id+' | '+index +"  |  "+p_date);
+				
+				// person
+				if(index==0){
+					mui.openWindow({
+						url:'person.html',
+						id:'info.html',
+						show:{
+					      autoShow:true,//页面loaded事件发生后自动显示，默认为true
+					      aniShow:"slide-in-right",
+					      duration:'250'
+					    },
+					    extras:{
+					      p_name:p_name,
+					      p_id:p_id
+					    },
+					    waiting:{
+					      autoShow:false,//自动显示等待框，默认为true
+				      	}
+					});
+					
+				}else if((index==2) || (index==3)){ //detail
+					var data={'id':p_id,'start':p_date,'end':p_date};
+					
+					postData(SERVER_HOST_FORMAL+MODULE_DETAIL,data,
+						function(data){
+							//console.log(data);							
+							var list = JSON.parse(data);
+							var str='';
+							for(var i=0;i<list.length;i++){
+								var tmp=list[i];
+								str+=tmp.time;
+								str+=',';
+								str+=tmp.type;
+								str+=',';
+								str+=tmp.machine;
+								str+='\r\n';
+							}
+							
+							var btnArray = ['确定'];
+							mui.confirm(str,'详细信息',btnArray,null);
+						},
+						null
+					);					
+				}
+			});
+			
+			var qbtn=document.getElementById('query');
+			mui.trigger(qbtn,'tap');
+			
+		</script>
+	</body>
+
+</html>

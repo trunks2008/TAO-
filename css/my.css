@@ -1,0 +1,15 @@
+.pcenter{
+	height:45px; 
+	width:200px; 
+	overflow:hidden;
+}
+
+.ptextcenter{
+	text-align:center;
+	line-height: 45px;  
+	margin-left: 3px;
+}
+
+.checkbtn{
+	margin-top: 5px;
+}

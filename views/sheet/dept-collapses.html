@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>部门统计</title>
+
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+		<script src="../../js/mui.min.js"></script>
+		<script src="../../js/serverutils.js"></script>
+		<script src="../../js/ajaxutils.js"></script>
+
+		<link rel="stylesheet" href="../../css/mui.min.css">
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">部门统计</h1>
+		</header>
+
+		<div class="mui-content">
+			<div class="mui-card">
+				<ul class="mui-table-view mui-table-view-chevron" id="deptul">
+				</ul>
+			</div>
+		</div>
+
+		<script>
+			(function($, doc) {
+				$.init();
+				$.ready(function() {
+					var data = {};
+
+					var deptul = doc.getElementById("deptul");
+
+					postData(SERVER_HOST_FORMAL + MODULE_DEPTLIST, data,
+						function(ret) {
+							var deptdata = JSON.parse(ret);
+
+							for(var i = 0; i < deptdata.length; i++) {
+								var li = doc.createElement("li");
+								li.setAttribute("id", deptdata[i].value);
+
+								var a = doc.createElement("a");
+								a.setAttribute("class", "mui-navigate-right");
+								a.innerText = deptdata[i].text;
+
+								li.appendChild(a);
+
+								//无子部门
+								if(deptdata[i].children == undefined) {
+									li.setAttribute("class", "mui-table-view-cell");
+									li.setAttribute("leafdept", "true");
+
+								} else if(deptdata[i].children != undefined) {
+									li.setAttribute("class", "mui-table-view-cell mui-collapse");
+									li.setAttribute("leafdept", "false");
+
+									var cul = doc.createElement("ul");
+									cul.setAttribute("class", "mui-table-view mui-table-view-chevron");
+
+									for(var j = 0; j < deptdata[i].children.length; j++) {
+										var cli = doc.createElement("li");
+										cli.setAttribute("class", "mui-table-view-cell");
+										cli.setAttribute("leafdept", "true");
+										cli.setAttribute("id", deptdata[i].children[j].value);
+
+										var ca = doc.createElement("a");
+										ca.setAttribute("class", "mui-navigate-right");
+										ca.innerText = deptdata[i].children[j].text;
+
+										cli.appendChild(ca);
+										cul.appendChild(cli);
+									}
+									li.appendChild(cul);
+								}
+								deptul.appendChild(li);
+							}
+
+						},
+						null
+					);
+
+					//ul上添加tap事件
+					//mui('#deptul').on('tap','li',function(e){
+					mui('.mui-table-view').on('tap', '.mui-table-view-cell', function(e) {
+						var lid = this.getAttribute("id");
+						var ldept = this.getAttribute("leafdept")
+
+						var achild = this.firstChild;
+						var d_name = achild.innerHTML;
+
+						//无孩子跳转
+						if(ldept == 'true') {
+
+							/*
+							 * 2018-12-13 edit
+							 * 本页面只显示一级部门，二级部门不再显示在二级列表
+							 * 勿删
+							 */
+							//							mui.openWindow({
+							//								url: '../subviews/dept-detail.html',
+							//								id: 'dept-detail.html',
+							//								show: {
+							//									autoShow: true,
+							//									aniShow: "slide-in-right",
+							//									duration: '250'
+							//								},
+							//								extras: {
+							//									p_id: lid,
+							//									d_name: d_name
+							//								},
+							//								waiting: {
+							//									autoShow: false, //自动显示等待框，默认为true
+							//								}
+							//							});
+
+							mui.openWindow({
+								url: '../subviews/dept-level1.html',
+								id: 'dept-level1.html',
+								show: {
+									autoShow: true,
+									aniShow: "slide-in-right",
+									duration: '250'
+								},
+								extras: {
+									p_id: lid,
+									d_name: d_name
+								},
+								waiting: {
+									autoShow: false, //自动显示等待框，默认为true
+								}
+							});
+
+						}
+
+					});
+
+				});
+
+			})(mui, document);
+		</script>
+	</body>
+
+</html>

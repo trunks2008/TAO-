@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>person</title>
+
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+		<link rel="stylesheet" href="../../css/mui.min.css">
+		<link rel="stylesheet" href="../../css/mytable.css">
+		<link rel="stylesheet" href="../../css/time-axis.css">
+
+		<script src="../../js/mui.min.js"></script>
+		<script src="../../js/serverutils.js"></script>
+		<script src="../../js/ajaxutils.js"></script>
+		<script src="../../js/timeutils.js"></script>
+		<script src="../../js/echarts.min.js"></script>
+		<script src="../../js/jquery.min.js"></script>
+
+		<style>
+			.timechart {
+				margin-top: 10px;
+				width: 350px;
+				height: 300px;
+			}
+		</style>
+
+	</head>
+	<header class="mui-bar mui-bar-nav">
+		<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+		<h1 class="mui-title">个人出勤</h1>
+	</header>
+
+	<div class="mui-content">
+
+		<ul class="mui-table-view" style="margin-top: 1px;">
+			<li class="mui-table-view-cell mui-media">
+				<a href="">
+					<img class="mui-media-object mui-pull-left" src="../../img/headman.png">
+					<div class="mui-media-body" id="p_name"></div>
+					<p class='mui-ellipsis' id='dept'></p>
+				</a>
+			</li>
+		</ul>
+
+		<table width="94%" class="table" id="weekTable">
+			<tr>
+				<th width=30%>日期</th>
+				<th width=32%>签到时间</th>
+				<th width=32%>签退时间</th>
+			</tr>
+		</table>
+
+		<div class="mui-card">
+			<ul class="time-axis" id="mark-timeline">
+				<!--<li class="time-axis-item">
+					<div class="time-axis-date">2003.10<span></span></div>
+					<div class="time-axis-title">初涉教育行业</div>
+				</li>
+				<li class="time-axis-item">
+					<div class="time-axis-date">2010.07<span></span></div>
+					<div class="time-axis-title">总公司成立</div>
+					<p class="time-axis-achievement">sss</p>
+				</li>
+				<li class="time-axis-item">
+					<div class="time-axis-date">2010.12<span></span></div>
+					<div class="time-axis-title">总公司成立</div>
+				</li>-->
+			</ul>
+		</div>
+		<div class="mui-card">
+			<div id="chart" class='timechart'></div>
+		</div>
+	</div>
+
+	<body>
+
+		<script type="text/javascript">
+			mui.plusReady(function() {
+				var self = plus.webview.currentWebview();
+				var p_id = self.p_id;
+				var p_name = self.p_name;
+
+				document.getElementById('p_name').innerHTML = p_name;
+
+				var data = {
+					'id': p_id
+				};
+
+				var timeline = document.getElementById("mark-timeline");
+				postData(SERVER_HOST_FORMAL + MODULE_SDAYS_RECORD_REMARK, data,
+					function(ret) {
+						var list = JSON.parse(ret);
+						if(list.length == 0) {
+
+						} else {
+							for(var i = 0; i < list.length; i++) {
+								var li = document.createElement('li');
+								li.setAttribute("class", "time-axis-item");
+
+								var div1 = document.createElement('div');
+								div1.setAttribute("class", "time-axis-date");	
+								
+								var type;
+								if(list[i]['type']=='on'){
+									type='签到';
+								}else{
+									type='签退';
+								}
+								div1.innerHTML =list[i]['date'].slice(5,10)+type;  
+
+								var span = document.createElement('span');
+
+								var div2 = document.createElement('div');
+								div2.setAttribute("class", "time-axis-title");
+								div2.innerHTML = list[i]['mark'];
+
+								div1.appendChild(span);
+								li.appendChild(div1);
+								li.appendChild(div2);
+								if(list[i]['inloc']!=''){									
+									var p = document.createElement('p');
+									p.setAttribute("class", "time-axis-achievement");
+									p.innerHTML=list[i]['inloc'];
+									li.appendChild(p);
+								}
+								timeline.appendChild(li);
+							}
+						}
+
+					}, null
+				);
+
+				postData(SERVER_HOST_FORMAL + MODULE_PINFOREC, data,
+					function(ret) {
+						var map = JSON.parse(ret);
+						document.getElementById('dept').innerHTML = map.dept;
+
+						var list = map.list;
+						var cate = [];
+						var hours = [];
+
+						//draw table
+						var objTable = document.getElementById("weekTable");
+						for(var i = 0; i < list.length; i++) {
+							var att = list[i];
+							var tr = document.createElement('tr');
+
+							var tddate = document.createElement('td');
+							var tdstime = document.createElement('td');
+							var tdetime = document.createElement('td');
+
+							tddate.innerHTML = att.date;
+							tdstime.innerHTML = att.beg;
+							tdetime.innerHTML = att.end;
+
+							cate.unshift(att.date.substring(5, 10));
+							var diff = TimeDiff(att.end, att.beg);
+							hours.unshift(diff);
+
+							if(att.beg > '08:30:00') {
+								tdstime.style.color = "Red";
+							}
+
+							if(att.end < '16:00:00') {
+								tdetime.style.color = "Red";
+							}
+
+							tr.appendChild(tddate);
+							tr.appendChild(tdstime);
+							tr.appendChild(tdetime);
+
+							objTable.appendChild(tr);
+						}
+
+						//draw chart
+						var myChart = echarts.init(document.getElementById('chart'));
+						var option = {
+							title: {
+								text: '工作时长'
+							},
+							tooltip: {},
+							legend: {
+								data: ['小时']
+							},
+							xAxis: {
+								type: 'category',
+								data: cate
+							},
+							yAxis: {
+								type: 'value'
+							},
+							series: [{
+								name: '小时',
+								type: 'line',
+								data: hours,
+								itemStyle: {
+									normal: {
+										label: {
+											show: true, //是否展示  
+											textStyle: {
+												fontWeight: 'bolder',
+												fontSize: '14',
+												fontFamily: '微软雅黑',
+											}
+										}
+									}
+								},
+								areaStyle: {
+									normal: {
+										color: "#28a5fc"
+									}
+								}
+							}]
+						};
+						myChart.setOption(option);
+					},
+					null
+				);
+
+			});
+		</script>
+	</body>
+
+</html>

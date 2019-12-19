@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>excel</title>
+
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+		<link rel="stylesheet" href="../../css/mui.picker.min.css" />
+		<link rel="stylesheet" href="../../css/mui.min.css">
+		<link rel="stylesheet" href="../../css/my.css" />
+
+		<script src="../../js/mui.min.js"></script>
+		<script src="../../js/serverutils.js"></script>
+		<script src="../../js/ajaxutils.js"></script>
+		<script src="../../js/mui.picker.min.js"></script>
+		<script src="../../js/timeutils.js"></script>
+
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">报表下载</h1>
+		</header>
+
+		<div class="mui-content">
+			<div class="mui-card">
+				<div>
+					<span class="ptextcenter">起始日期</span>
+					<button id="start" class="btn mui-btn checkbtn">选择时间 </button>
+				</div>
+				<div>
+					<span class="ptextcenter">结束日期</span>
+					<button id="end" class="btn mui-btn checkbtn">选择时间 </button>
+					<!--<button id="query" class="btn mui-btn mui-btn-blue checkbtn" style="float: right;margin-right: 10px;">查询</button>-->
+				</div>
+			</div>
+
+			<div class="mui-card">
+				<ul class="mui-table-view" id="excel_ul">
+					<li class="mui-table-view-cell mui-media" id="person">
+						<a href="javascript:;">
+							<img class="mui-media-object mui-pull-left" src="../../img/download.png">
+							<div class="mui-media-body">个人出勤报表</div>
+						</a>
+					</li>
+					<li class="mui-table-view-cell mui-media" id="dept">
+						<a href="javascript:;">
+							<img class="mui-media-object mui-pull-left" src="../../img/download.png">
+							<div class="mui-media-body">部门出勤报表</div>
+						</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+
+		<script>
+			(function($, doc) {
+				$.init();
+
+				var ndate = new Date();
+				var nowdate = ndate.Format("yyyy-MM-dd");
+				document.getElementById('end').innerHTML = nowdate;
+
+				ndate.setDate(ndate.getDate() - 31);
+				document.getElementById('start').innerHTML = ndate.Format("yyyy-MM-dd");
+
+				document.getElementById('start').addEventListener('tap', function() {
+					var dtPicker = new mui.DtPicker({　　　　
+						"type": "date"
+					});
+					dtPicker.show(function(rs) {
+						document.getElementById('start').innerHTML = rs.text;
+					});　
+				})
+
+				document.getElementById('end').addEventListener('tap', function() {
+					var dtPicker = new mui.DtPicker({　　　　
+						"type": "date"
+					});　　
+					dtPicker.show(function(rs) {
+						document.getElementById('end').innerHTML = rs.text;
+					});　
+				})
+
+				$.plusReady(function() {
+					var self = plus.webview.currentWebview();
+					var p_id = self.p_id;
+					
+
+					document.getElementById('person').addEventListener('tap', function() {
+						var stvalue = document.getElementById('start').innerHTML;
+						var edvalue = document.getElementById('end').innerHTML;
+						
+						if(stvalue>edvalue){
+							var btnArray = ['确定'];
+								var str = '请选择正确起始截止日期!';
+								mui.confirm(str, '错误', btnArray, null);
+						}
+						
+						var data = {
+							'pid': p_id,
+							'stvalue':stvalue,
+							'edvalue':edvalue
+						};
+
+						postData(SERVER_HOST_FORMAL + MODULE_DLEXCEL_PERSON, data,
+							function(ret) {
+//								console.log(ret);
+								if(ret) {
+									plus.nativeUI.toast('开始下载');
+								}
+								//console.log(SERVER_HOST_FORMAL + ret);
+								openFile(SERVER_HOST_FORMAL + ret);
+							});
+					});
+					
+					document.getElementById('dept').addEventListener('tap', function() {
+						var stvalue = document.getElementById('start').innerHTML;
+						var edvalue = document.getElementById('end').innerHTML;
+						
+						if(stvalue>edvalue){
+							var btnArray = ['确定'];
+								var str = '请选择正确起始截止日期!';
+								mui.confirm(str, '错误', btnArray, null);
+						}
+						
+						var data = {
+							'pid': p_id,
+							'stvalue':stvalue,
+							'edvalue':edvalue
+						};
+
+						postData(SERVER_HOST_FORMAL + MODULE_DLEXCEL_DEPT, data,
+							function(ret) {
+								console.log(ret);
+								if(ret) {
+									plus.nativeUI.toast('开始下载');
+								}
+								//console.log(SERVER_HOST_FORMAL + ret);
+								openFile(SERVER_HOST_FORMAL + ret);
+							});
+					}); 
+
+					function openFile(url) {
+						//console.log('download');
+						var wait = plus.nativeUI.showWaiting("下载文件...");
+						//创建一个下载任务
+						var dtask = plus.downloader.createDownload(url, {}, function(d, status) {
+							//console.log(status);
+							if(status == 200) {
+								var fileUrl = d.filename;
+								console.log(fileUrl);
+								plus.runtime.openFile(fileUrl, {}, function(e) {
+									console.log('打开失败');
+								});
+							} else {
+								console.log("Download failed: " + status);
+							}
+							wait.close();
+						});
+
+						dtask.addEventListener("statechanged", function(download, status) {
+							switch(download.state) {
+								case 2:
+									wait.setTitle("正在连接");
+									break;
+								case 3:
+									var percent = download.downloadedSize / download.totalSize * 100;
+									wait.setTitle("已下载 " + parseInt(percent) + "%");
+									break;
+								case 4:
+									wait.setTitle("下载完成");
+									break;
+							}
+						});
+
+						dtask.start();
+					}
+
+				});
+
+			})(mui, document);
+		</script>
+	</body>
+
+</html>

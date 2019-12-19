@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>contact</title>
+
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+		<link rel="stylesheet" href="../css/mui.min.css">
+		<link rel="stylesheet" href="../css/mui.indexedlist.css">
+
+		<script src="../js/mui.min.js"></script>
+		<script src="../js/ajaxutils.js"></script>
+		<script src="../js/serverutils.js"></script>
+		<script src="../js/mui.indexedlist.js?v=22"></script>
+
+		<style>
+			html,body {
+				height: auto;
+				/*overflow: hidden;*/ 
+			}    
+			 
+			.mui-bar {
+				-webkit-box-shadow: none;
+				box-shadow: none;
+			} 
+		</style>
+
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<h1 class="mui-title">通讯录</h1>
+		</header>
+		<div class="mui-content">
+			
+			<div id='list' class="mui-indexed-list">
+				<div class="mui-indexed-list-search mui-input-row mui-search">
+					<input type="search" class="mui-input-clear mui-indexed-list-search-input" placeholder="搜索">
+				</div>
+
+				<div class="mui-indexed-list-bar">
+					<a>A</a>
+					<a>B</a>
+					<a>C</a>
+					<a>D</a>
+					<a>E</a>
+					<a>F</a>
+					<a>G</a>
+					<a>H</a>
+					<a>I</a>
+					<a>J</a>
+					<a>K</a>
+					<a>L</a>
+					<a>M</a>
+					<a>N</a>
+					<a>O</a>
+					<a>P</a>
+					<a>Q</a>
+					<a>R</a>
+					<a>S</a>
+					<a>T</a>
+					<a>U</a>
+					<a>V</a>
+					<a>W</a>
+					<a>X</a>
+					<a>Y</a>
+					<a>Z</a>
+					<!--<a>Z1</a>
+					<a>Z2</a>
+					<a>Z3</a>
+					<a>Z4</a>
+					<a>Z5</a>
+					<a>Z6</a>
+					<a>Z7</a>
+					<a>Z8</a>-->
+				</div>
+				<div class="mui-indexed-list-alert"></div>
+				<div class="mui-indexed-list-inner">
+					<div class="mui-indexed-list-empty-alert">没有数据</div>
+					<ul class="mui-table-view">
+						<li data-group="A" class="mui-table-view-divider mui-indexed-list-group" id="agroup">A</li>
+						<li data-group="B" class="mui-table-view-divider mui-indexed-list-group" id="bgroup">B</li>
+						<li data-group="C" class="mui-table-view-divider mui-indexed-list-group" id="cgroup">C</li>
+						<li data-group="D" class="mui-table-view-divider mui-indexed-list-group" id="dgroup">D</li>
+						<li data-group="E" class="mui-table-view-divider mui-indexed-list-group" id="egroup">E</li>
+						<li data-group="F" class="mui-table-view-divider mui-indexed-list-group" id="fgroup">F</li>
+
+						<li data-group="G" class="mui-table-view-divider mui-indexed-list-group" id="ggroup">G</li>
+						<li data-group="H" class="mui-table-view-divider mui-indexed-list-group" id="hgroup">H</li>
+						<li data-group="I" class="mui-table-view-divider mui-indexed-list-group" id="igroup">I</li>
+						<li data-group="J" class="mui-table-view-divider mui-indexed-list-group" id="jgroup">J</li>
+						<li data-group="K" class="mui-table-view-divider mui-indexed-list-group" id="kgroup">K</li>
+						<li data-group="L" class="mui-table-view-divider mui-indexed-list-group" id="lgroup">L</li>
+
+						<li data-group="M" class="mui-table-view-divider mui-indexed-list-group" id="mgroup">M</li>
+						<li data-group="N" class="mui-table-view-divider mui-indexed-list-group" id="ngroup">N</li>
+						<li data-group="O" class="mui-table-view-divider mui-indexed-list-group" id="ogroup">O</li>
+						<li data-group="P" class="mui-table-view-divider mui-indexed-list-group" id="pgroup">P</li>
+						<li data-group="Q" class="mui-table-view-divider mui-indexed-list-group" id="qgroup">Q</li>
+						<li data-group="R" class="mui-table-view-divider mui-indexed-list-group" id="rgroup">R</li>
+
+						<li data-group="S" class="mui-table-view-divider mui-indexed-list-group" id="sgroup">S</li>
+						<li data-group="T" class="mui-table-view-divider mui-indexed-list-group" id="tgroup">T</li>
+						<li data-group="U" class="mui-table-view-divider mui-indexed-list-group" id="ugroup">U</li>
+						<li data-group="V" class="mui-table-view-divider mui-indexed-list-group" id="vgroup">V</li>
+						<li data-group="W" class="mui-table-view-divider mui-indexed-list-group" id="wgroup">W</li>
+						<li data-group="X" class="mui-table-view-divider mui-indexed-list-group" id="xgroup">X</li>
+
+						<li data-group="Y" class="mui-table-view-divider mui-indexed-list-group" id="ygroup">Y</li>
+						<li data-group="Z" class="mui-table-view-divider mui-indexed-list-group" id="zgroup">Z</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		</div>
+
+		<script>
+			function insertAfter(newElement, targetElement) { // newElement是要追加的元素 targetElement 是指定元素的位置 
+				var parent = targetElement.parentNode; // 找到指定元素的父节点 
+				if(parent.lastChild == targetElement) { // 判断指定元素的是否是节点中的最后一个位置 如果是的话就直接使用appendChild方法 
+					parent.appendChild(newElement, targetElement);
+				} else {
+					parent.insertBefore(newElement, targetElement.nextSibling);
+				};
+			};
+
+			function addElementByPy(eid, name, group) {
+				var li = document.createElement("li");
+				li.setAttribute('data-value', name);
+				li.setAttribute('data-tags', eid);
+				li.setAttribute('id', eid);
+				li.setAttribute('class', 'mui-table-view-cell mui-indexed-list-item');
+				li.innerHTML = name;
+				insertAfter(li, group);
+			} 
+
+			mui.init();
+			
+			mui.ready(function() {
+				var header = document.querySelector('header.mui-bar');
+				var list = document.getElementById('list');
+				//calc hieght
+//				console.log(window.screen.height); 
+//				console.log( header.offsetHeight);
+//				alert(document.body.clientHeight - header.offsetHeight);
+//				list.style.height = (document.body.offsetHeight - header.offsetHeight) + 'px';
+				list.style.height = (window.screen.height - header.offsetHeight-110) + 'px';
+				
+				//create
+				window.indexedList = new mui.IndexedList(list);
+				
+				mui(".mui-table-view").on('tap','.mui-indexed-list-item',function(){
+					var id=this.getAttribute('id');
+					var name=this.getAttribute('data-value');
+					//console.log(id+'  '+name);
+					
+					mui.openWindow({
+						url:'subviews/contact.html',
+						id:'contact.html',
+						show:{
+					      autoShow:true,//页面loaded事件发生后自动显示，默认为true
+					      aniShow:"slide-in-right",
+					      duration:'250'
+					    },
+					    extras:{
+					      p_name:name,
+					      p_id:id
+					    },
+					    waiting:{
+					      autoShow:false,//自动显示等待框，默认为true
+				      	}
+					});
+					
+				});
+			});
+
+			postData(SERVER_HOST_FORMAL + MODULE_ALLEMPLOYEE, {},
+				function(ret) {
+					var list = JSON.parse(ret);
+
+					for(var i = 0; i < list.length; i++) {
+						var map = list[i];
+						var name = map.ename;
+						var pyf = map.first;
+						var eid = map.eid;
+
+						if(pyf == 'a') {
+							var group = document.getElementById('agroup');
+							addElementByPy(eid, name, group);
+						} else if(pyf == 'b') {
+							var group = document.getElementById('bgroup');
+							addElementByPy(eid, name, group);
+						} else if(pyf == 'c') {
+							var group = document.getElementById('cgroup');
+							addElementByPy(eid, name, group);
+						} else if(pyf == 'd') {
+							var group = document.getElementById('dgroup');
+							addElementByPy(eid, name, group);
+						} else if(pyf == 'e') {
+							var group = document.getElementById('egroup');
+							addElementByPy(eid, name, group);
+						} else if(pyf == 'f') {
+							var group = document.getElementById('fgroup');
+							addElementByPy(eid, name, group);
+						} else if(pyf == 'g') {
+							var group = document.getElementById('ggroup');
+							addElementByPy(eid, name, group);
+						} else if(pyf == 'h') {
+							var group = document.getElementById('hgroup');
+							addElementByPy(eid, name, group);
+						} else if(pyf == 'i') {
+							var group = document.getElementById('igroup');
+							addElementByPy(eid, name, group);
+						} else if(pyf == 'g') {
+							var group = document.getElementById('ggroup');
+							addElementByPy(eid, name, group);
+						} else if(pyf == 'k') {
+							var group = document.getElementById('kgroup');
+							addElementByPy(eid, name, group);
+						} else if(pyf == 'l') {
+							var group = document.getElementById('lgroup');
+							addElementByPy(eid, name, group);
+						} else if(pyf == 'm') {
+							var group = document.getElementById('mgroup');
+							addElementByPy(eid, name, group);
+						} else if(pyf == 'n') {
+							var group = document.getElementById('ngroup');
+							addElementByPy(eid, name, group);
+						} else if(pyf == 'o') {
+							var group = document.getElementById('ogroup');
+							addElementByPy(eid, name, group);
+						} else if(pyf == 'p') {
+							var group = document.getElementById('pgroup');
+							addElementByPy(eid, name, group);
+						} else if(pyf == 'q') {
+							var group = document.getElementById('qgroup');
+							addElementByPy(eid, name, group);
+						} else if(pyf == 'r') {
+							var group = document.getElementById('rgroup');
+							addElementByPy(eid, name, group);
+						} else if(pyf == 's') {
+							var group = document.getElementById('sgroup');
+							addElementByPy(eid, name, group);
+						} else if(pyf == 't') {
+							var group = document.getElementById('tgroup');
+							addElementByPy(eid, name, group);
+						} else if(pyf == 'u') {
+							var group = document.getElementById('ugroup');
+							addElementByPy(eid, name, group);
+						} else if(pyf == 'v') {
+							var group = document.getElementById('vgroup');
+							addElementByPy(eid, name, group);
+						} else if(pyf == 'w') {
+							var group = document.getElementById('wgroup');
+							addElementByPy(eid, name, group);
+						} else if(pyf == 'x') {
+							var group = document.getElementById('xgroup');
+							addElementByPy(eid, name, group);
+						} else if(pyf == 'y') {
+							var group = document.getElementById('ygroup');
+							addElementByPy(eid, name, group);
+						} else if(pyf == 'z') {
+							var group = document.getElementById('zgroup');
+							addElementByPy(eid, name, group);
+						}
+					}
+				},
+				null
+			);
+
+			//主页点击两次退出
+			var backButtonPress = 0;
+			mui.back = function(event) {
+				backButtonPress++;
+				if(backButtonPress > 1) {
+					plus.runtime.quit();
+				} else {
+					plus.nativeUI.toast('再按一次退出应用');
+				}
+				setTimeout(function() {
+					backButtonPress = 0;
+				}, 1000);
+				return false;
+			};
+		</script>
+	</body>
+
+</html>

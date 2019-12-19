@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>today</title>
+
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+		<link rel="stylesheet" href="../../css/mui.min.css">
+		<script src="../../js/mui.min.js"></script>
+
+		<script src="../../js/serverutils.js"></script>
+		<script src="../../js/ajaxutils.js"></script>
+		<script src="../../js/echarts.min.js"></script>
+		<script src="../../js/timeutils.js"></script>
+
+		<style>
+			.timechart {
+				margin-top: 10px;
+				width: 350px;
+				height: 300px;
+			}
+			.fctitle{
+				color: #1699C5;
+				font-family: "微软雅黑";
+				font-size: 20px;
+				font-weight: 700;
+			}
+			.fc{
+				margin-top: 3px;
+				font-family:Arial,Helvetica,sans-serif;
+    			font-size:1em;
+    			font-size: 30px;
+			}
+			.ulp{
+				padding-left: 200px;
+				padding-right: 200px;
+			}
+			.denum{
+				font-family:"黑体";
+				font-size: 26px;
+			}
+			.dedes{
+				font-family:"黑体";
+				font-weight: 700;
+			}
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">今日概览</h1>
+		</header>
+		<div class="mui-content">
+			<div id="chart" class='timechart'></div>
+			
+			<div align="center">
+				<div class="fctitle">打卡人数/应到人数</div>
+			</div>
+			<div align="center">
+				<div id="fcdata" class="fc"></div>
+			</div>
+			
+			<div align="center" style="padding-top: 40px;">
+				<ul class="mui-table-view mui-grid-view mui-grid-9 ulp" id="homeMenu">  
+		            <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-4" id="daily">  		                    
+		                <span id="renotchecked" class="denum">&nbsp;</span>  
+		                <div class="mui-media-body dedes">未打卡</div></a></li>  
+		            <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-4" id="person">  
+		                <span id="later" class="denum">&nbsp;</span>
+		                <div class="mui-media-body dedes">迟到</div></a></li>  
+		            <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-4" id="dept">  
+		                <span id="out" class="denum">&nbsp;</span>
+		                <div class="mui-media-body dedes">外勤</div></a></li> 
+				</ul> 
+			</div>
+		</div>
+
+		<script>
+			postData(SERVER_HOST_FORMAL + MODULE_TODAY_OVERVIEW, {},
+				function(ret) {
+					console.log(ret);
+
+					//draw chart
+					var myChart = echarts.init(document.getElementById('chart'));
+					var map = JSON.parse(ret);
+					var all = map['all'];
+					var checked = map['checked'];
+					
+					document.getElementById('fcdata').innerHTML=checked+'/'+all;
+					document.getElementById('renotchecked').innerText=all-checked;
+					document.getElementById('later').innerText=map['late'];
+					document.getElementById('out').innerText=0;
+					
+					option = {		
+						title:{
+					        text:new Date().Format("yyyy-MM-dd"),					        
+					        x:'center',
+					        y:'top',
+					        textAlign:'left'
+					   },
+						tooltip: {
+							show:false, //add 关闭悬浮提示 
+							trigger: 'item',
+							formatter: "{b}: {c} ({d}%)"
+						},
+						color:[
+							'#6495ED','#E9967A'
+						],
+						legend: {
+							orient: 'vertical',
+							x: 'right',
+							data: ['已签到', '未签到']						
+						},
+						series: [{							
+							name: '签到情况',
+							type: 'pie',
+							radius: ['50%', '70%'],
+							avoidLabelOverlap: false,
+							hoverAnimation:false,  //add
+							label: {
+								normal: {
+									//show: false,
+									show:true,
+									position: 'center',
+									formatter:function(){
+										return  '正常签到率\r\n'+(Math.round(checked / all * 10000) / 100.00 + "%")
+									},
+									textStyle:{
+										color:'#1699C5',
+										fontFamily: "微软雅黑",
+										fontSize: 20,
+										fontWeight: 700,
+									}
+								},
+								emphasis: {
+									show: false,
+									textStyle: {
+										fontSize: '30',
+										fontWeight: 'bold'
+									}
+								}
+							},
+							labelLine: {
+								normal: {
+									show: false
+								}
+							},
+							data: [{
+									value: checked,
+									name: '已签到'
+								},
+								{
+									value: all-checked,
+									name: '未签到'
+								}								
+							]
+						}]
+					};
+					myChart.setOption(option);
+				}, null
+			);
+		</script>
+	</body>
+
+</html>

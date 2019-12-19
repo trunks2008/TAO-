@@ -1,0 +1,263 @@
+{
+  "index.html": {
+    "resources": [
+      "js/mui.min.js",
+      "css/mui.min.css",
+      "fonts/mui.ttf",
+      "img/title_logo.png"
+    ],
+    "refer": [
+      "views/main.html",
+      "views/main2.html",
+      "preindex.html",
+      "views/guide.html",
+      "views/out/outmain.html",
+      "views/preindex.html"
+    ]
+  },
+  "views/main.html": {
+    "resources": [
+      "css/mui.min.css",
+      "views/a1.html",
+      "js/jump.js",
+      "views/a4.html",
+      "views/a5.html",
+      "views/a8.html",
+      "views/a3.html"
+    ],
+    "refer": [
+      "views/a1.html",
+      "views/a5.html",
+      "views/a2.html",
+      "views/a4.html",
+      "views/a3.html",
+      "views/a8.html"
+    ]
+  },
+  "views/a3.html": {
+    "resources": [
+      "css/mui.min.css"
+    ],
+    "refer": []
+  },
+  "views/a2.html": {
+    "resources": [
+      "css/mui.min.css"
+    ],
+    "refer": [
+      "views/a2.html"
+    ]
+  },
+  "views/main2.html": {
+    "resources": [
+      "css/mui.min.css",
+      "views/a1.html"
+    ],
+    "refer": [
+      "views/a5.html",
+      "views/a2.html",
+      "views/a4.html",
+      "views/a3.html",
+      "views/a1.html"
+    ]
+  },
+  "views/a1.html": {
+    "resources": [
+      "css/mui.min.css",
+      "img/table8.png",
+      "img/table7.png",
+      "img/table6.png",
+      "img/table1.png",
+      "img/table5.png",
+      "img/table3.png",
+      "img/table9.png",
+      "img/table4.png",
+      "img/table2.png",
+      "views/sheet/daily.html",
+      "js/mui.min.js"
+    ],
+    "refer": [
+      "views/sheet/daily.html",
+      "views/sheet/person.html",
+      "views/sheet/dept.html",
+      "views/sheet/worklog.html",
+      "views/sheet/interest.html",
+      "views/sheet/today.html",
+      "views/sheet/sign.html",
+      "views/sheet/wifisign.html",
+      "views/sheet/chatai.html",
+      "views/sheet/quota.html",
+      "views/sheet/trajectory.html",
+      "views/sheet/dept-collapses.html",
+      "views/sheet/group.html",
+      "views/subviews/dept-detail.html",
+      "views/subviews/dept-level1.html",
+      "views/sheet/excel.html",
+      "views/sheet/sign2.html",
+      "views/sheet/inspect.html"
+    ]
+  },
+  "views/sheet/daily.html": {
+    "resources": [
+      "js/mui.min.js",
+      "css/mui.min.css",
+      "css/mui.dtpicker.css",
+      "js/mui.picker.js",
+      "js/mui.picker.min.js",
+      "css/mui.picker.min.css"
+    ],
+    "refer": [
+      "views/a1.html",
+      "views/sheet/person.html"
+    ]
+  },
+  "views/a4.html": {
+    "resources": [
+      "css/mui.min.css"
+    ],
+    "refer": [
+      "views/subviews/contact.html"
+    ]
+  },
+  "views/sheet/dept.html": {
+    "refer": [
+      "views/sheet/person.html"
+    ],
+    "resources": []
+  },
+  "views/sheet/interest.html": {
+    "refer": [
+      "views/sheet/person.html",
+      "views/subviews/editlist.html"
+    ],
+    "resources": []
+  },
+  "views/a5.html": {
+    "refer": [
+      "index.html",
+      "views/subviews/editpwd.html"
+    ],
+    "resources": []
+  },
+  "preindex.html": {
+    "refer": [
+      "index.html",
+      "views/out/outmain.html"
+    ],
+    "resources": []
+  },
+  "views/out/outmain.html": {
+    "refer": [
+      "views/out/o1.html",
+      "views/out/o5.html"
+    ],
+    "resources": [
+      "views/out/o1.html"
+    ]
+  },
+  "views/guide.html": {
+    "refer": [
+      "views/out/outmain.html"
+    ],
+    "resources": [
+      "css/mui.min.css"
+    ]
+  },
+  "views/out/o5.html": {
+    "refer": [
+      "views/preindex.html"
+    ],
+    "resources": []
+  },
+  "views/preindex.html": {
+    "refer": [
+      "index.html",
+      "views/out/outmain.html"
+    ],
+    "resources": []
+  },
+  "views/out/o1.html": {
+    "refer": [
+      "views/out/subviews/bus.html",
+      "views/out/subviews/ochat.html",
+      "views/out/subviews/package.html",
+      "views/out/subviews/special.html",
+      "views/out/subviews/phone.html",
+      "views/out/subviews/safe.html",
+      "views/out/subviews/sea.html",
+      "views/out/subviews/checkin.html",
+      "views/out/subviews/battery.html"
+    ],
+    "resources": []
+  },
+  "views/out/subviews/bus.html": {
+    "refer": [
+      "views/out/subviews/dbus/d701.html",
+      "views/out/subviews/dbus/t701.html",
+      "views/out/subviews/dbus/f701.html",
+      "views/out/subviews/dbus/t702.html",
+      "views/out/subviews/dbus/f702.html",
+      "views/out/subviews/dbus/t703.html",
+      "views/out/subviews/dbus/f703.html",
+      "views/out/subviews/dbus/t705.html",
+      "views/out/subviews/dbus/f705.html",
+      "views/out/subviews/dbus/tlai.html",
+      "views/out/subviews/dbus/flai.html",
+      "views/out/subviews/dbus/fjiao.html",
+      "views/out/subviews/dbus/tjiao.html",
+      "views/out/subviews/dbus/fji.html",
+      "views/out/subviews/dbus/fping.html",
+      "views/out/subviews/dbus/tji.html",
+      "views/out/subviews/dbus/tping.html"
+    ],
+    "resources": []
+  },
+  "views/sheet/dept-collapses.html": {
+    "refer": [
+      "views/subviews/dept-detail.html",
+      "views/subviews/dept-level1.html"
+    ],
+    "resources": []
+  },
+  "views/subviews/dept-detail.html": {
+    "refer": [
+      "views/sheet/person.html"
+    ],
+    "resources": []
+  },
+  "views/sheet/group.html": {
+    "refer": [
+      "views/subviews/free-group.html"
+    ],
+    "resources": []
+  },
+  "views/subviews/dept-level1.html": {
+    "refer": [
+      "views/subviews/dept-detail.html",
+      "views/sheet/person.html",
+      "views/subviews/uncheck-person.html",
+      "views/subviews/latercheck-person.html",
+      "views/subviews/outcheck-person.html",
+      "views/subviews/earlycheck-person.html"
+    ],
+    "resources": []
+  },
+  "views/sheet/sign.html": {
+    "refer": [
+      "views/subviews/add-remark.html",
+      "views/subviews/outcheck.html"
+    ],
+    "resources": []
+  },
+  "views/subviews/editpwd.html": {
+    "refer": [
+      "views/subviews/editcheck.html"
+    ],
+    "resources": []
+  },
+  "views/sheet/inspect.html": {
+    "refer": [
+      "views/subviews/inspecthistory.html"
+    ]
+  }
+}

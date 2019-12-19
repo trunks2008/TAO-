@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>PERSON</title>
+
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+		<link rel="stylesheet" href="../css/mui.min.css">
+		<script src="../js/mui.min.js"></script>
+
+		<script src="../js/constants.js"></script>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<h1 class="mui-title">个人</h1>
+		</header>
+
+		<div class="mui-content">
+			<ul class="mui-table-view" style="margin-top: 1px;">
+				<li class="mui-table-view-cell mui-media" id="personkey">
+					<a href="">
+						<img class="mui-media-object mui-pull-left" src="../img/headman.png">
+						<div class="mui-media-body" id="p_name"></div>
+						<p class='mui-ellipsis' id='dept'></p>
+					</a>
+				</li>
+			</ul>
+
+			<div class="mui-content">
+				<ul class="mui-table-view">
+					<li class="mui-table-view-cell" id="editpwd">
+						<a class="mui-navigate-right">修改密码</a>
+					</li>
+				</ul>
+			</div>
+
+			<div class="mui-content-padded">
+				<div class="mui-button-row">
+					<button type="button" class="mui-btn mui-btn-primary mui-btn-block" id="logout">退出登录</button>
+				</div>
+			</div>
+		</div>
+
+		<script type="text/javascript">
+			mui.init({});
+
+			mui.plusReady(function() {
+				var state = constants.getState();
+
+				//console.log(state.account);
+				//console.log(state.dept);
+
+				document.getElementById('p_name').innerHTML = state.account;
+				document.getElementById('dept').innerHTML = state.dept;
+
+				document.getElementById('editpwd').addEventListener('tap', function() {
+					console.log('edit pwd');
+					mui.openWindow({
+						url: 'subviews/editpwd.html',
+						id: 'editpwd.html',
+						show: {
+							autoShow: true,
+							aniShow: "slide-in-right",
+							duration: '150'
+						},
+						extras: {
+							isout: true
+						},
+						waiting: {
+							autoShow: false,
+							title: '正在加载...'
+						}
+					});
+				});
+
+				document.getElementById('logout').addEventListener('tap', function() {
+					console.log('logout');
+
+					var state = constants.getState();
+					state = null;
+					constants.setState(state);
+
+					var wvs, self, launch;
+					wvs = plus.webview.all();
+					self = plus.webview.currentWebview();
+					launch = plus.webview.getLaunchWebview();
+
+					for(var i = 0, len = wvs.length; i < len; i++) {
+						//if((wvs[i].getURL() == self.getURL()) || (wvs[i].getURL() == launch.getURL()) || (wvs[i].getURL().indexOf('index.html')!=-1)  ) {
+						if((wvs[i].getURL() == self.getURL()) || (wvs[i].getURL() == launch.getURL())) {
+							//if(wvs[i].getURL() == self.getURL() ) 
+							continue;
+						}
+						wvs[i].close();
+					}
+					self.close();
+
+					//打开主页面
+					mui.openWindow({
+						url: '../index.html',
+						id: 'index.html',
+						show: {
+							autoShow: true,
+							aniShow: "slide-in-right",
+							duration: '150'
+						},
+						extras: {
+							isout: true
+						},
+						waiting: {
+							autoShow: false,
+							title: '正在加载...'
+						}
+					});
+
+				});
+
+			});
+
+			//主页点击两次退出
+			var backButtonPress = 0;
+			mui.back = function(event) {
+				backButtonPress++;
+				if(backButtonPress > 1) {
+					plus.runtime.quit();
+				} else {
+					plus.nativeUI.toast('再按一次退出应用');
+				}
+				setTimeout(function() {
+					backButtonPress = 0;
+				}, 1000);
+				return false;
+			};
+			
+		</script>
+
+	</body>
+
+</html>

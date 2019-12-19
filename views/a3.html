@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+				
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		
+		<link rel="stylesheet" href="../css/mui.min.css">
+		<script src="../js/mui.min.js"></script>	
+	</head>
+	<body>
+		<header class="mui-bar mui-bar-nav">			
+			<h1 class="mui-title">公告</h1>
+		</header>
+		<div class="mui-content">
+			<div align="center" style="padding-top: 20px;">
+				<div >
+					暂无公告...
+				</div>
+			</div>	
+		</div>
+		<script >
+			//主页点击两次退出
+			
+			(function($, doc) {
+				$.init();
+				$.ready(function() {
+					var backButtonPress = 0;
+					$.back = function(event) {
+						backButtonPress++;
+						if(backButtonPress > 1) {
+							plus.runtime.quit();
+						} else {
+							plus.nativeUI.toast('再按一次退出应用');
+						}
+						setTimeout(function() {
+							backButtonPress = 0;
+						}, 1000);
+						return false;
+					};
+				});
+			})(mui, document);
+			
+			
+		</script>		
+	</body>
+</html>

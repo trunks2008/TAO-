@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>外勤签到</title>
+
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+		<script src="../../js/mui.min.js"></script>
+		<script src="../../js/serverutils.js"></script>
+		<script src="../../js/ajaxutils.js"></script>
+
+		<link rel="stylesheet" href="../../css/mui.min.css">
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">外勤签到</h1>
+		</header>
+
+		<div class="mui-content">
+			<form class="mui-input-group" style="margin: 10px 5px;">
+				<div class="mui-input-row">
+					<label>当前定位:</label>
+					<input type="text" placeholder="自动定位" id="loc" readonly="readonly">
+				</div>
+				<div class="mui-input-row">
+					<label>打卡时间:</label>
+					<input type="text" placeholder="" id="time" readonly="readonly">
+				</div>
+			</form>
+
+			<div class="mui-input-row" style="margin: 10px 5px;">
+				<div>手动输入位置:</div>
+				<textarea id="loc-edit" rows="2" placeholder="自动定位不准时请人工输入位置"></textarea>
+			</div>
+
+			<div class="mui-input-row" style="margin: 10px 5px;">
+				<div>外勤备注：</div>
+				<textarea id="remarks" rows="5" placeholder="请添加外勤信息"></textarea>
+			</div>
+
+			<div class="mui-button-row">
+				<button type="button" class="mui-btn mui-btn-primary" id="insert">签到</button>
+			</div>
+		</div>
+
+		<script>
+			(function($, doc) {
+				$.init();
+				$.plusReady(function() {
+					var self = plus.webview.currentWebview();
+					var loc = self.loc;
+					var time = self.time;
+					var pid = self.pid;
+					var name = self.name;
+					
+					console.log(pid);
+
+					document.getElementById('loc').value = loc;
+					document.getElementById('time').value = time;
+
+					document.getElementById('insert').addEventListener('tap', function() {
+						console.log('submit');
+
+						var sdata = {
+							'id': pid,
+							'name': name,
+							'position': '-1',
+							'loc':loc
+						};
+
+						postData(SERVER_HOST_FORMAL + MODULE_OUTSIGN, sdata,
+							function(ret) {
+								if(ret > 0) {
+									plus.nativeUI.toast('外勤签到成功');
+									mui.back();
+								}else{
+									 plus.nativeUI.toast('外勤签到失败，请稍后重试');
+								}
+							});
+
+					});
+
+				});
+			})(mui, document);
+		</script>
+		</script>
+
+	</body>
+
+</html>

@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>quota</title>
+
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+		<link rel="stylesheet" href="../../css/mui.min.css">
+		<script src="../../js/mui.min.js"></script>
+
+		<script src="../../js/serverutils.js"></script>
+		<script src="../../js/ajaxutils.js"></script>
+
+		<script src="../../js/echarts.min.js"></script>
+
+		<style>
+			.tiptop {
+				padding-left: 10px;
+				padding-top: 40px;
+			}
+			.titles{
+				padding-top: 3px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">机场运行</h1>
+		</header>
+
+		<div class="mui-content" style="background: #FFFFFF;">
+			<div align="center" id="title" class="titles"></div>
+			
+			<div class="mui-row">
+				<div class="mui-col-sm-6 mui-col-xs-6">
+					<div id="pieDiagram" style="height: 150px; wight: 150px"></div>
+				</div>
+				<div class="mui-col-sm-6 mui-col-xs-6 tiptop">
+					<div>累计旅客:</div>
+					<div id="llvke"></div>
+					<div id="tblvke"></div>
+				</div>
+			</div>
+
+			<div class="mui-row">
+				<div class="mui-col-sm-6 mui-col-xs-6">
+					<div id="pieDiagram2" style="height: 150px; wight: 150px"></div>
+				</div>
+				<div class="mui-col-sm-6 mui-col-xs-6 tiptop">
+					<div>累计货邮:</div>
+					<div id="lhuoyou"></div>
+					<div id="tbhy"></div>
+				</div>
+			</div>
+
+			<div class="mui-row">
+				<div class="mui-col-sm-6 mui-col-xs-6">
+					<div id="pieDiagram3" style="height: 150px; wight: 150px"></div>
+				</div>
+				<div class="mui-col-sm-6 mui-col-xs-6 tiptop">
+					<div>累计航班:</div>
+					<div id="lhangban"></div>
+					<div id="tbhb"></div>
+				</div>
+			</div>
+			
+			<div style="padding: 10px;">
+				<div>生产数据：</div>
+				<div id="today"></div>
+			</div>
+		</div>
+		<div>
+
+		</div>
+		</div>
+
+		<script>
+			Date.prototype.Format = function(fmt) {
+				var o = {
+					"M+": this.getMonth() + 1, // 月份
+					"d+": this.getDate(), // 日
+					"h+": this.getHours(), // 小时
+					"m+": this.getMinutes(), // 分
+					"s+": this.getSeconds(), // 秒
+					"q+": Math.floor((this.getMonth() + 3) / 3), // 季度
+					"S": this.getMilliseconds()
+				};
+				if(/(y+)/.test(fmt))
+					fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "")
+						.substr(4 - RegExp.$1.length));
+				for(var k in o)
+					if(new RegExp("(" + k + ")").test(fmt))
+						fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) :
+							(("00" + o[k]).substr(("" + o[k]).length)));
+				return fmt;
+			}
+			document.getElementById('title').innerHTML ='三大指标同比(截至'+ new Date().Format('yyyy年MM月dd日')+')'
+			
+			postData(SERVER_HOST_FORMAL + MODULE_QUOTA, {},
+				function(ret) {
+					console.log(ret);
+					var myChart = echarts.init(document.getElementById('pieDiagram'));
+					var myChart2 = echarts.init(document.getElementById('pieDiagram2'));
+					var myChart3 = echarts.init(document.getElementById('pieDiagram3'));
+					myChart.title = '累计旅客';
+
+					var obj = JSON.parse(ret);
+
+					var lvke = returnFloat(obj.lvke / 10000);
+					var huoyou = returnFloat(obj.huoyou / 10000);
+					var jiaci = returnFloat(obj.jiaci / 10000);
+
+					var lvke_b = obj.lvke / obj.l_lvke;
+					var huoyou_b = obj.huoyou / obj.l_huoyou;
+					var jiaci_b = obj.jiaci / obj.l_jiaci;
+
+					var zz1 = returnFloat(lvke_b * 100 - 100);
+					var zz2 = returnFloat(huoyou_b * 100 - 100);
+					var zz3 = returnFloat(jiaci_b * 100 - 100);
+
+					document.getElementById('llvke').innerHTML = lvke + '万人';
+					document.getElementById('lhuoyou').innerHTML = huoyou + '万吨';
+					document.getElementById('lhangban').innerHTML = jiaci + '万架次';
+
+					document.getElementById('tblvke').innerHTML = '同比增长' + zz1 + '%';
+					document.getElementById('tbhy').innerHTML = '同比增长' + zz2 + '%';
+					document.getElementById('tbhb').innerHTML = '同比增长' + zz3 + '%';
+
+					var now = new Date();
+					now.setDate(now.getDate()-1);  
+					document.getElementById('today').innerHTML = now.Format('yyyy年MM月dd日') + ',实际执行' + obj.n_jiaci + '架次，旅客吞吐量' + obj.n_lvke + '人次，货邮吞吐量' + obj.n_huoyou + '吨,机场放行正常率'+obj.n_fangxing+'%。';
+
+					option11 = {
+						tooltip: {
+							trigger: 'item',
+							formatter: "{a} <br/>{b}: {c} ({d}%)"
+						},
+						legend: {
+							orient: 'vertical',
+							x: 'left',
+							data: ['必应', '其他']
+						},
+						color: ['#1C86EE', '#ffffff'],
+						series: [{
+							name: '累计旅客',
+							type: 'pie',
+							selectedMode: 'single',
+							radius: [0, '30%'],
+
+							label: {
+								normal: {
+									position: 'inner'
+								}
+							},
+							labelLine: {
+								normal: {
+									show: false
+								}
+							},
+							data: [{
+								value: 260,
+								name: '2018'
+							}, {
+								value: 100,
+								name: ''
+							}]
+						}, {
+							name: '累计旅客',
+							type: 'pie',
+							radius: ['40%', '55%'],
+							label: {
+								normal: {
+									formatter: '{b}',
+									backgroundColor: '#eee',
+									borderColor: '#aaa',
+									borderWidth: 1,
+									borderRadius: 4,
+									rich: {
+										a: {
+											color: '#999',
+											lineHeight: 22,
+											align: 'center'
+										},
+										hr: {
+											borderColor: '#aaa',
+											width: '100%',
+											borderWidth: 0.5,
+											height: 0
+										},
+										b: {
+											fontSize: 16,
+											lineHeight: 33
+										},
+										per: {
+											color: '#eee',
+											backgroundColor: '#334455',
+											padding: [2, 4],
+											borderRadius: 2
+										}
+									}
+								}
+							},
+							data: [{
+								value: 260 * lvke_b,
+								name: '2019'
+							}, {
+								value: 100 / lvke_b,
+								name: ''
+							}]
+						}]
+					};
+					myChart.setOption(option11);
+
+					option22 = {
+						tooltip: {
+							trigger: 'item',
+							formatter: "{a} <br/>{b}: {c} ({d}%)"
+						},
+						legend: {
+							orient: 'vertical',
+							x: 'left',
+							data: ['必应', '其他']
+						},
+						color: ['#1C86EE', '#ffffff'],
+						series: [{
+							name: '累计货邮',
+							type: 'pie',
+							selectedMode: 'single',
+							radius: [0, '30%'],
+
+							label: {
+								normal: {
+									position: 'inner'
+								}
+							},
+							labelLine: {
+								normal: {
+									show: false
+								}
+							},
+							data: [{
+								value: 260,
+								name: '2018'
+							}, {
+								value: 100,
+								name: ''
+							}]
+						}, {
+							name: '累计货邮',
+							type: 'pie',
+							radius: ['40%', '55%'],
+							label: {
+								normal: {
+									formatter: '{b}',
+									backgroundColor: '#eee',
+									borderColor: '#aaa',
+									borderWidth: 1,
+									borderRadius: 4,
+									rich: {
+										a: {
+											color: '#999',
+											lineHeight: 22,
+											align: 'center'
+										},
+										hr: {
+											borderColor: '#aaa',
+											width: '100%',
+											borderWidth: 0.5,
+											height: 0
+										},
+										b: {
+											fontSize: 16,
+											lineHeight: 33
+										},
+										per: {
+											color: '#eee',
+											backgroundColor: '#334455',
+											padding: [2, 4],
+											borderRadius: 2
+										}
+									}
+								}
+							},
+							data: [{
+								value: 260 * huoyou_b,
+								name: '2019'
+							}, {
+								value: 100 / huoyou_b,
+								name: ''
+							}]
+						}]
+					};
+					myChart2.setOption(option22);
+
+					option33 = {
+						tooltip: {
+							trigger: 'item',
+							formatter: "{a} <br/>{b}: {c} ({d}%)"
+						},
+						legend: {
+							orient: 'vertical',
+							x: 'left',
+							data: ['必应', '其他']
+						},
+						color: ['#1C86EE', '#ffffff'],
+						series: [{
+							name: '累计航班',
+							type: 'pie',
+							selectedMode: 'single',
+							radius: [0, '30%'],
+
+							label: {
+								normal: {
+									position: 'inner'
+								}
+							},
+							labelLine: {
+								normal: {
+									show: false
+								}
+							},
+							data: [{
+								value: 260,
+								name: '2018'
+							}, {
+								value: 100,
+								name: ''
+							}]
+						}, {
+							name: '累计航班',
+							type: 'pie',
+							radius: ['40%', '55%'],
+							label: {
+								normal: {
+									formatter: '{b}',
+									backgroundColor: '#eee',
+									borderColor: '#aaa',
+									borderWidth: 1,
+									borderRadius: 4,
+									rich: {
+										a: {
+											color: '#999',
+											lineHeight: 22,
+											align: 'center'
+										},
+										hr: {
+											borderColor: '#aaa',
+											width: '100%',
+											borderWidth: 0.5,
+											height: 0
+										},
+										b: {
+											fontSize: 16,
+											lineHeight: 33
+										},
+										per: {
+											color: '#eee',
+											backgroundColor: '#334455',
+											padding: [2, 4],
+											borderRadius: 2
+										}
+									}
+								}
+							},
+							data: [{
+								value: 260 * jiaci_b,
+								name: '2019'
+							}, {
+								value: 100 / jiaci_b,
+								name: ''
+							}]
+						}]
+					};
+					myChart3.setOption(option33);
+				},
+				null
+			);
+
+			function returnFloat(value) {
+				var value = Math.round(parseFloat(value) * 100) / 100;
+				var xsd = value.toString().split(".");
+				if(xsd.length == 1) {
+					value = value.toString() + ".00";
+					return value;
+				}
+				if(xsd.length > 1) {
+					if(xsd[1].length < 2) {
+						value = value.toString() + "0";
+					}
+					return value;
+				}
+			}
+
+			
+		</script>
+	</body>
+
+</html>

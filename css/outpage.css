@@ -1,0 +1,23 @@
+.opage{
+	padding: 10px;
+	background: #FFFFFF;
+}
+
+.otitle{
+	font-size: 20px;
+	color: #007AFF;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+.otitle2{
+	font-size: 18px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+.otext{
+	font-size: 14px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}

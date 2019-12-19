@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>worklog</title>
+		
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+		<link rel="stylesheet" href="../../css/mui.min.css">		
+		<link rel="stylesheet" href="../../css/my.css">	
+		<link rel="stylesheet" href="../../css/mui.picker.min.css" />
+		
+		<script src="../../js/mui.min.js"></script>		
+		<script src="../../js/timeutils.js"></script>
+		<script src="../../js/serverutils.js"></script>
+		<script src="../../js/ajaxutils.js"></script>
+		<script src="../../js/constants.js"></script>
+		<script src="../../js/mui.picker.min.js"></script>
+		
+		<style>
+			.mui-table h4,.mui-table h5,.mui-table .mui-h5,.mui-table .mui-h6,.mui-table p{
+		        margin-top: 0;
+		    }
+		    .mui-table h4{
+		        line-height: 21px;
+		        font-weight: 500;
+		    }
+		
+		    .mui-table .oa-icon{
+		        position: absolute;
+		        right:0;
+		        bottom: 0;
+		    }
+		    .mui-table .oa-icon-star-filled{
+		        color:#f14e41;
+		    }
+		</style>
+	</head>
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">工作日志</h1>
+		</header>
+
+		<div class="mui-content">						
+			<div>
+				<span class="ptextcenter">起始日期</span>
+				<button id="start" class="btn mui-btn checkbtn">选择时间 </button>
+			</div>
+			<div>
+				<span class="ptextcenter">结束日期</span>
+				<button id="end" class="btn mui-btn checkbtn">选择时间 </button>
+				<button id="query" class="btn mui-btn mui-btn-blue checkbtn" style="float: right;margin-right: 10px;">查询</button>
+			</div>
+			
+			<ul class="mui-table-view mui-table-view-striped mui-table-view-condensed" id="logList">		       
+		  	</ul>			
+		</div>
+		
+		<script>
+			(function($, doc) {
+				$.init();
+				$.ready(function() {
+				
+					var nowdate = new Date();								
+					doc.getElementById('end').innerHTML=nowdate.Format("yyyy-MM-dd");
+					
+					nowdate.setDate(nowdate.getDate()-5);
+					doc.getElementById('start').innerHTML=nowdate.Format("yyyy-MM-dd");
+				
+					var state = constants.getState();			
+					var data={'id':state.pid};					
+					var logList = doc.getElementById("logList");					
+					postData(SERVER_HOST_FORMAL + MODULE_QTWORKLOG, data,
+						function(ret) {
+							var list= JSON.parse(ret);
+							for(var i=0;i<list.length;i++){
+								var map=list[i];								
+								addList(map);
+							}
+						},
+						null
+					);
+					
+					function addList(contentmap){
+						var li=doc.createElement("li");
+						var table=doc.createElement("div");
+						var tablecell_l=doc.createElement("div");
+						var tablecell_r=doc.createElement("div");
+						var h4=doc.createElement("h4");
+						var h5=doc.createElement("h5");
+						var sp=doc.createElement("span");
+						
+						li.setAttribute("class","mui-table-view-cell");
+						table.setAttribute("class","mui-table");					
+						tablecell_l.setAttribute("class","mui-table-cell mui-col-xs-9");
+						tablecell_r.setAttribute("class","mui-table-cell mui-col-xs-3 mui-text-right");
+						h4.setAttribute("class","mui-ellipsis-2");
+						sp.setAttribute("class","mui-h5");
+						
+						h4.innerText=contentmap.content;
+						h5.innerText=contentmap.begtime+" - "+contentmap.endtime;
+						sp.innerText=contentmap.date;
+						
+						li.appendChild(table);
+						table.appendChild(tablecell_l);
+						table.appendChild(tablecell_r);
+						tablecell_l.appendChild(h4);
+						tablecell_l.appendChild(h5);
+						tablecell_r.appendChild(sp);
+						
+						logList.appendChild(li);
+					};
+					
+					doc.getElementById('start').addEventListener('tap', function() {
+						var dtPicker = new mui.DtPicker({　　　　
+							"type": "date"
+						});
+						dtPicker.show(function(rs){
+							doc.getElementById('start').innerHTML=rs.text;									
+						});　
+					});
+		
+					doc.getElementById('end').addEventListener('tap', function() {
+						var dtPicker = new mui.DtPicker({　　　　
+							"type": "date"
+						});　　
+						dtPicker.show(function(rs){
+							doc.getElementById('end').innerHTML=rs.text;
+						});　
+					});
+					
+					doc.getElementById('query').addEventListener('tap',function(){
+						var data2={
+							'id':state.pid,
+							'begDate':doc.getElementById('start').innerHTML,
+							'endDate':doc.getElementById('end').innerHTML
+						};
+						
+						postData(SERVER_HOST_FORMAL + MODULE_QDWORKLOG, data2,
+							function(ret) {
+								//clear
+								doc.getElementById('logList').innerHTML='';								
+								
+								var list= JSON.parse(ret);
+								for(var i=0;i<list.length;i++){
+									var map=list[i];								
+									addList(map);
+								}
+							},
+							null
+						);						
+					});
+					
+				});
+			})(mui, document);
+		</script>
+		
+	</body>
+</html>

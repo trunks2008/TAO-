@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>dept</title>
+
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+		<script src="../../js/mui.min.js"></script>
+		<script src="../../js/serverutils.js"></script>
+		<script src="../../js/ajaxutils.js"></script>
+		<script src="../../js/mui.picker.js"></script>
+		<script src="../../js/mui.poppicker.js"></script>
+		<script src="../../js/timeutils.js"></script>
+		<script src="../../js/mui.picker.min.js"></script>
+		<script src="../../js/echarts.min.js"></script>
+
+		<link rel="stylesheet" href="../../css/mui.min.css">
+		<link rel="stylesheet" href="../../css/mui.picker.min.css" />
+		<link rel="stylesheet" href="../../css/mui.poppicker.css" />
+		<link rel="stylesheet" href="../../css/my.css" />
+		<link rel="stylesheet" href="../../css/mytable.css" />
+
+		<style>
+			.timebtn {
+				font-size: 14px;
+				padding: 4px;
+				margin: 3px;
+			}
+			
+			.deptbtn {
+				font-size: 16px;
+				padding: 8px;
+				margin: 3px;
+				margin-left: 3px;
+				margin-right: 0px;
+				padding-left: 10px;
+			}
+			
+			.ntip {
+				font-size: 26px;
+				text-align: center;
+				padding-top: 200px;
+			}
+			
+			.allfoot {
+				width: 170px;
+				height: 50px;
+				position: fixed;
+				float: right;
+				bottom: 0;
+			}
+			
+			
+			.timechart {
+				margin-top: 10px;
+				width: 240px;
+				height: 240px;
+				margin: 0 auto;
+			}
+			
+			.fctitle {
+				color: #1699C5;
+				font-family: "微软雅黑";
+				font-size: 20px;
+				font-weight: 700;
+			}
+			
+			.fc {
+				margin-top: 3px;
+				font-family: Arial, Helvetica, sans-serif;
+				font-size: 1em;
+				font-size: 30px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title" id="deptname"></h1>
+		</header>
+
+		<div class="mui-content">
+			<div>
+				<span class="ptextcenter" sytle="font-size:14px">日期:</span>
+				<button id="start" class="btn mui-btn checkbtn" style="margin-left: 3px;">选择时间 </button>
+				<button id="query" class="btn mui-btn mui-btn-blue checkbtn" style="float: right;margin-right: 10px;">查询</button>
+			</div>
+			
+			<div class="mui-card">
+				<div id="chart2" class='timechart'></div>
+				<div align="center">
+					<div class="fctitle">打卡人数/应到人数</div>
+					<p id="fcdata" class="fc"></p>
+				</div>
+			</div>
+
+			<table id="tablevalue" class="table mui-hidden" width="98%">
+				<tr>
+					<th width=30%>人员</th>
+					<th width=34%>签到时间</th>
+					<th width=34%>签退时间</th>
+				</tr>
+			</table>
+
+			<!--当日无需显示工作时长-->
+			<div id="chart" class="timechart mui-hidden"></div>
+
+			<div id="nodata" class="ntip mui-hidden">当日无人打卡</div>
+
+			<!--<button id="alldeptquery" type="button" class="mui-btn mui-btn-primary" style="float: right;margin-right: 10px;margin-top: 20px">部门整体考勤</button>-->
+
+		</div>
+
+		<script>
+			(function($, doc) {
+				$.init();
+				$.plusReady(function() {
+					var self = plus.webview.currentWebview();
+					var p_id = self.p_id;
+					var d_name = self.d_name;
+					var all = self.memcount;
+					var checked = self.ncount;
+					
+					//console.log(memcount +' - '+ncount);
+
+					document.getElementById('deptname').innerHTML = d_name;
+
+					var nowdate = new Date(); 
+					nowdate.setDate(nowdate.getDate());
+					doc.getElementById('start').innerHTML = nowdate.Format("yyyy-MM-dd");
+
+					doc.getElementById('start').addEventListener('tap', function() {
+						var dtPicker = new mui.DtPicker({　　　　
+							"type": "date"
+						});
+						dtPicker.show(function(rs) {
+							doc.getElementById('start').innerHTML = rs.text;
+						});　
+					})
+					
+					var myChart2 = echarts.init(document.getElementById('chart2'));
+					option = {
+								title: {
+									text: new Date().Format("yyyy-MM-dd"),
+									x: 'center',
+									y: 'top',
+									textAlign: 'left'
+								},
+								tooltip: {
+									show: false, //add 关闭悬浮提示 
+									trigger: 'item',
+									formatter: "{b}: {c} ({d}%)"
+								},
+								color: [
+									'#6495ED', '#E9967A'
+								],
+								legend: {
+									orient: 'vertical',
+									x: 'right',
+									data: ['已签到', '未签到']
+								},
+								series: [{
+									name: '签到情况',
+									type: 'pie',
+									radius: ['50%', '70%'],
+									avoidLabelOverlap: false,
+									hoverAnimation: false, //add
+									label: {
+										normal: {
+											//show: false,
+											show: true,
+											position: 'center',
+											formatter: function() {
+												return '正常签到率\r\n' + (Math.round(checked / all * 10000) / 100.00 + "%")
+											},
+											textStyle: {
+												color: '#1699C5',
+												fontFamily: "微软雅黑",
+												fontSize: 20,
+												fontWeight: 700,
+											}
+										},
+										emphasis: {
+											show: false,
+											textStyle: {
+												fontSize: '30',
+												fontWeight: 'bold'
+											}
+										}
+									},
+									labelLine: {
+										normal: {
+											show: false
+										}
+									},
+									data: [{
+											value: checked,
+											name: '已签到'
+										},
+										{
+											value: all - checked,
+											name: '未签到'
+										}
+									]
+								}]
+							};
+					myChart2.setOption(option);
+					document.getElementById('fcdata').innerHTML = checked + '/' + all;
+ 
+					doc.getElementById('query').addEventListener('tap', function() {
+						var stvalue = document.getElementById('start').innerHTML;
+						var data = {
+							'start': stvalue,
+							'deptl1': p_id,
+							'deptl2': 'null'
+						};
+
+						postData(SERVER_HOST_FORMAL + MODULE_DEPTRECORD, data,
+							function(ret) {
+								var objTable = document.getElementById("tablevalue");
+								var len = objTable.rows.length;
+								if(len > 1) {
+									for(var i = len - 1; i > 0; i--) {
+										document.getElementById("tablevalue").deleteRow(1);
+									}
+								}
+
+								var cate = [];
+								var hours = [];
+								var list = JSON.parse(ret);
+
+								if(list.length == 0) {
+									document.getElementById('tablevalue').classList.add('mui-hidden');
+									document.getElementById('chart').classList.add('mui-hidden');
+									document.getElementById("nodata").classList.remove('mui-hidden');
+
+								} else {
+									document.getElementById("tablevalue").classList.remove('mui-hidden');
+									//document.getElementById('chart').classList.remove('mui-hidden');
+									document.getElementById("nodata").classList.add('mui-hidden');
+
+									//当天隐藏chart
+									if(nowdate.Format("yyyy-MM-dd") != stvalue) {
+										document.getElementById('chart').classList.remove('mui-hidden');
+									} else {
+										document.getElementById('chart').classList.add('mui-hidden');
+									}
+
+									for(var i = 0; i < list.length; i++) {
+										var att = list[i];
+										var tr = document.createElement('tr');
+										tr.id = att.id;
+
+										var tdname = document.createElement('td');
+										var tdstime = document.createElement('td');
+										var tdetime = document.createElement('td');
+
+										tdname.innerHTML = att.name;
+										tdstime.innerHTML = att.begTime;
+										tdetime.innerHTML = att.endTime;
+
+										cate.unshift(att.name);
+										var diff = TimeDiff(att.endTime, att.begTime);
+										hours.unshift(diff);
+
+										if(att.begTime > '08:30:00') {
+											tdstime.style.color = "Red";
+										}
+
+										if(att.endTime < '16:00:00') {
+											tdetime.style.color = "red";
+										}
+
+										tr.appendChild(tdname);
+										tr.appendChild(tdstime);
+										tr.appendChild(tdetime);
+
+										objTable.appendChild(tr);
+									}
+
+									//draw chart
+									var myChart = echarts.init(document.getElementById('chart'));
+									var option = {
+										title: {
+											text: '工作时长'
+										},
+										tooltip: {},
+										legend: {
+											data: ['小时']
+										},
+										xAxis: {
+											type: 'category',
+											data: cate,
+											axisLabel: {
+												interval: 0,
+												rotate: 40
+											}
+										},
+										yAxis: {
+											type: 'value'
+										},
+										series: [{
+											name: '小时',
+											type: 'bar',
+											data: hours,
+											itemStyle: {
+												normal: {
+													color: '#5CACEE',
+													label: {
+														show: true, //是否展示  
+														textStyle: {
+															fontWeight: 'bolder',
+															fontSize: '12',
+															fontFamily: '微软雅黑',
+														}
+													}
+												}
+											},
+											areaStyle: {
+												normal: {
+													color: "#28a5fc"
+												}
+											}
+										}]
+									};
+									myChart.setOption(option);
+								}
+
+							},
+							null
+						);
+					});
+
+					//全部门
+					//					doc.getElementById('alldeptquery').addEventListener('tap', function() {
+					//						var data={
+					//							date:document.getElementById('start').innerHTML,
+					//							pid:p_id
+					//						};
+					//						console.log(data);
+					//					});
+
+					//点人下钻
+					mui('#tablevalue').on('tap', 'td', function(e) {
+						var row = this.parentNode;
+						var index = this.cellIndex;
+						var p_id = row.id;
+						var p_name = row.cells[0].innerHTML;
+
+						mui.openWindow({
+							url: '../sheet/person.html',
+							id: 'person.html',
+							show: {
+								autoShow: true, 
+								aniShow: "slide-in-right",
+								duration: '250'
+							},
+							extras: {
+								p_name: p_name,
+								p_id: p_id
+							},
+							waiting: {
+								autoShow: false,
+							}
+						});
+					});
+
+					//默认第一次提交 query
+					mui.trigger(document.getElementById('query'), 'tap');
+
+				});
+			})(mui, document);
+		</script>
+	</body>
+
+</html>

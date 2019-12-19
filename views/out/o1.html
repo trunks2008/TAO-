@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>TAO+</title>
+
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+		<link rel="stylesheet" href="../../css/mui.min.css">
+		<script src="../../js/mui.min.js"></script>
+		<script src="../../js/constants.js"></script>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<h1 class="mui-title">tao+</h1>
+		</header>
+
+		<div class="mui-content">
+			<ul class="mui-table-view mui-grid-view mui-grid-9" id="homeMenu">
+				<li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-4" id="bus">
+					<a href="">
+						<img src="../../img/bus.png" height="70" weight="70" />
+						<div class="mui-media-body">机场巴士</div>
+					</a>
+				</li>
+				<li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-4" id="package">
+					<a href="">
+						<img src="../../img/package.png" height="70" weight="70" />
+						<div class="mui-media-body">行李服务</div>
+					</a>
+				</li>
+				<li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-4" id="checkin">
+					<a href="">
+						<img src="../../img/checkin.png" height="70" weight="70" />
+						<div class="mui-media-body">值机手续</div>
+					</a>
+				</li>
+				<li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-4" id="special">
+					<a href="">
+						<img src="../../img/special.png" height="70" weight="70" />
+						<div class="mui-media-body">特殊旅客</div>
+					</a>
+				</li>
+				<li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-4" id="phone">
+					<a href="">
+						<img src="../../img/phone.png" height="70" weight="70" />
+						<div class="mui-media-body">常用电话</div>
+					</a>
+				</li>
+				<li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-4" id="safe">
+					<a href="">
+						<img src="../../img/safe.png" height="70" weight="70" />
+						<div class="mui-media-body">安全检查</div>
+					</a>
+				</li>
+				<li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-4" id="sea">
+					<a href="">
+						<img src="../../img/sea.png" height="70" weight="70" />
+						<div class="mui-media-body">海关检查</div>
+					</a>
+				</li>
+				<li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-4" id="battery">
+					<a href="">
+						<img src="../../img/battery.png" height="70" weight="70" />
+						<div class="mui-media-body">锂电池运输</div>
+					</a>
+				</li>
+				<li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-4" id="ochat">
+					<a href="">
+						<img src="../../img/chat.png" height="70" weight="70" />
+						<div class="mui-media-body">智能查询</div>
+					</a>
+				</li>
+			</ul>
+		</div>
+
+		<script>
+			mui.init({});
+			mui.plusReady(function() {
+
+				mui("#homeMenu").on('tap', '.mui-table-view-cell', function() {
+					var resourceId = this.getAttribute("id");
+					if(resourceId == "") {
+						return;
+					}
+
+					var url = 'subviews/' + resourceId + ".html";
+					var id = url.substring(url.lastIndexOf('/') + 1);
+
+					var state = constants.getState();
+					var p_name = state.account;
+					var p_id = state.pid;
+
+					mui.openWindow({
+						url: url,
+						id: id,
+						show: {
+							autoShow: true, //页面loaded事件发生后自动显示，默认为true
+							aniShow: "slide-in-right",
+							duration: '250'
+						},
+						extras: {
+							p_name: p_name,
+							p_id: p_id
+						},
+						waiting: {
+							autoShow: false, //自动显示等待框，默认为true
+						}
+					});
+				});
+				
+			});
+
+			var backButtonPress = 0;
+			mui.back = function(event) {
+				backButtonPress++;
+				if(backButtonPress > 1) {
+					plus.runtime.quit();
+				} else {
+					plus.nativeUI.toast('再按一次退出应用');
+				}
+				setTimeout(function() {
+					backButtonPress = 0;
+				}, 1000);
+				return false;
+			};
+		</script>
+
+	</body>
+
+</html>

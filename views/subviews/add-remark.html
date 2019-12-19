@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>添加备注</title>
+
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+		<script src="../../js/mui.min.js"></script>
+		<script src="../../js/serverutils.js"></script>
+		<script src="../../js/ajaxutils.js"></script>
+
+		<link rel="stylesheet" href="../../css/mui.min.css">
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">添加备注</h1>
+		</header>
+
+		<div class="mui-content">
+			<form class="mui-input-group" style="margin: 10px 5px;">
+				<div class="mui-input-row">
+					<label>当前定位:</label>
+					<input type="text" placeholder="自动定位" id="loc" readonly="readonly">
+				</div>
+				<div class="mui-input-row">
+					<label>打卡时间:</label>
+					<input type="text" placeholder="自动定位" id="time" readonly="readonly">
+				</div>
+				<div class="mui-input-row">
+					<label>备注类型:</label>
+					<input type="text" placeholder="自动定位" id="type" readonly="readonly">
+				</div>
+			</form>
+
+			<div class="mui-input-row" style="margin: 10px 5px;">
+				<div>手动输入位置:</div>
+				<textarea id="loc-edit" rows="2" placeholder="自动定位不准时请人工输入位置"></textarea>
+			</div>
+
+			<div class="mui-input-row" style="margin: 10px 5px;">
+				<div>添加备注：</div>
+				<textarea id="remarks" rows="5" placeholder="请添加备注信息"></textarea>
+			</div>
+
+			<div class="mui-button-row">
+				<button type="button" class="mui-btn mui-btn-primary" id="insert"> 提交</button>&nbsp;&nbsp;
+				<button type="button" class="mui-btn mui-btn-danger" id="cancer">取消</button>
+			</div>
+		</div>
+
+		<script>
+			(function($, doc) {
+				$.init();
+				$.plusReady(function() {
+					var self = plus.webview.currentWebview();
+					var loc = self.loc;
+					var type = self.type;
+					var pid = self.pid;
+					var date = self.date;
+					var time = self.tmap;
+
+					var num = self.num;
+					var inputloc = self.inputloc;
+					var remark = self.remark;
+
+					doc.getElementById('loc').value = loc;
+
+					if(time == undefined) {
+						doc.getElementById('time').value = '暂无打卡时间';
+					} else {
+						doc.getElementById('time').value = time;
+					}
+
+					if(type == 'on') {
+						doc.getElementById('type').value = '签到备注';
+					} else if(type == 'off') {
+						doc.getElementById('type').value = '签退备注';
+					}
+
+					if(num == '1') {
+						doc.getElementById('loc-edit').value = inputloc;
+						doc.getElementById('remarks').value = remark;
+					}
+
+					doc.getElementById('insert').addEventListener('tap', function() {
+						var data = {
+							'pid': pid,
+							'date': date,
+							'type': type,
+							'sysloc': loc,
+							'inputloc': doc.getElementById('loc-edit').value,
+							'remark': doc.getElementById('remarks').value
+						};
+
+						//insert
+						if(num == '0') {
+							postData(SERVER_HOST_FORMAL + MODULE_ADD_RECORD_REMARK, data,
+								function(ret) {
+									if(ret == 1) {
+										plus.nativeUI.toast('提交备注成功');
+										doc.getElementById('loc-edit').value = '';
+										doc.getElementById('remarks').value = '';
+										mui.back();
+									} else {
+										plus.nativeUI.toast('提交失败，请稍后重试');
+									}
+								},
+								null
+							);
+						} else if(num == '1') { //update 
+							postData(SERVER_HOST_FORMAL + MODULE_UPDATE_RECORD_REMARK, data,
+								function(ret) {
+									if(ret == 1) {
+										plus.nativeUI.toast('更新备注成功');
+										doc.getElementById('loc-edit').value = '';
+										doc.getElementById('remarks').value = '';
+										mui.back();
+									} else {
+										plus.nativeUI.toast('提交失败，请稍后重试');
+									}
+								},
+								null
+							);
+						}
+
+					});
+
+				});
+			})(mui, document);
+		</script>
+		</script>
+
+	</body>
+
+</html>

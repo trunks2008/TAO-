@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>bus</title>
+
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+		<link rel="stylesheet" href="../../../css/mui.min.css">
+		<script src="../../../js/mui.min.js"></script>
+
+		<style>
+			.busfont {
+				color: #2187E7;
+				font-weight: bold;
+				font-size: 22px;
+			}
+			
+			.nullul {}
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">机场巴士</h1>
+		</header>
+
+		<div class="mui-content">
+			<ul class="mui-table-view mui-table-view-chevron">
+
+				<li class="mui-table-view-cell mui-media mui-collapse">
+					<a href="#">
+						<div class="mui-media-object mui-pull-left busfont">1</div>
+						<div class="mui-media-body">
+							701公交
+							<p class='mui-ellipsis'>府新大厦</p>
+						</div>
+					</a>
+					<ul class="mui-table-view mui-table-view-chevron nullul">
+						<li class="mui-table-view-cell" id="t701">
+							<a class="mui-navigate-right" href="#">府新大厦 -> 青岛流亭国际机场</a>
+						</li>
+						<li class="mui-table-view-cell" id="f701">
+							<a class="mui-navigate-right" href="#">青岛流亭国际机场 -> 府新大厦 </a>
+						</li>
+					</ul>
+				</li>
+
+				<li class="mui-table-view-cell mui-media mui-collapse">
+					<a href="#">
+						<div class="mui-media-object mui-pull-left busfont">2</div>
+						<div class="mui-media-body">
+							702公交
+							<p class='mui-ellipsis'>火车站南广场</p>
+						</div>
+					</a>
+					<ul class="mui-table-view mui-table-view-chevron nullul">
+						<li class="mui-table-view-cell" id="t702">
+							<a class="mui-navigate-right" href="#">火车站南广场 -> 青岛流亭国际机场</a>
+						</li>
+						<li class="mui-table-view-cell" id="f702">
+							<a class="mui-navigate-right" href="#">青岛流亭国际机场 -> 火车站南广场 </a>
+						</li>
+					</ul>
+				</li>
+
+				<li class="mui-table-view-cell mui-media mui-collapse">
+					<a href="#">
+						<div class="mui-media-object mui-pull-left busfont">3</div>
+						<div class="mui-media-body">
+							703公交
+							<p class='mui-ellipsis'>丽晶大酒店</p>
+						</div>
+					</a>
+					<ul class="mui-table-view mui-table-view-chevron nullul">
+						<li class="mui-table-view-cell" id="t703">
+							<a class="mui-navigate-right" href="#">丽晶大酒店 -> 青岛流亭国际机场</a>
+						</li>
+						<li class="mui-table-view-cell" id="f703">
+							<a class="mui-navigate-right" href="#">青岛流亭国际机场 -> 丽晶大酒店 </a>
+						</li>
+					</ul>
+				</li>
+
+				<li class="mui-table-view-cell mui-media mui-collapse">
+					<a href="#">
+						<div class="mui-media-object mui-pull-left busfont">5</div>
+						<div class="mui-media-body">
+							705公交
+							<p class='mui-ellipsis'>黄岛区政府（莫泰酒店）</p>
+						</div>
+					</a>
+					<ul class="mui-table-view mui-table-view-chevron nullul">
+						<li class="mui-table-view-cell" id="t705">
+							<a class="mui-navigate-right" href="#">黄岛区政府 -> 青岛流亭国际机场</a>
+						</li>
+						<li class="mui-table-view-cell" id="f705">
+							<a class="mui-navigate-right" href="#">青岛流亭国际机场 -> 黄岛区政府 </a>
+						</li>
+					</ul>
+				</li>
+
+				<li class="mui-table-view-cell mui-media mui-collapse">
+					<a href="#">
+						<div class="mui-media-object mui-pull-left busfont">胶</div>
+						<div class="mui-media-body">
+							胶南专线
+							<p class='mui-ellipsis'>胶南宏程粤海酒店</p>
+						</div>
+					</a>
+					<ul class="mui-table-view mui-table-view-chevron nullul">
+						<li class="mui-table-view-cell" id="tjiao">
+							<a class="mui-navigate-right" href="#">胶南宏程粤海酒店 -> 青岛流亭国际机场 （长班）</a>
+						</li>
+						<li class="mui-table-view-cell" id="fjiao">
+							<a class="mui-navigate-right" href="#">青岛流亭国际机场 -> 胶南宏程粤海酒店 （长班）</a>
+						</li>
+					</ul>
+				</li>
+
+				<li class="mui-table-view-cell mui-media mui-collapse">
+					<a href="#">
+						<div class="mui-media-object mui-pull-left busfont">莱</div>
+						<div class="mui-media-body">
+							莱西专线
+							<p class='mui-ellipsis'>莱西豪邦度假村</p>
+						</div>
+					</a>
+					<ul class="mui-table-view mui-table-view-chevron nullul">
+						<li class="mui-table-view-cell" id="tlai">
+							<a class="mui-navigate-right" href="#">莱西豪邦度假村 -> 青岛流亭国际机场</a>
+						</li>
+						<li class="mui-table-view-cell" id="flai">
+							<a class="mui-navigate-right" href="#">青岛流亭国际机场 -> 莱西豪邦度假村 </a>
+						</li>
+					</ul>
+				</li>
+
+				<li class="mui-table-view-cell mui-media mui-collapse">
+					<a href="#">
+						<div class="mui-media-object mui-pull-left busfont">即</div>
+						<div class="mui-media-body">
+							即墨专线
+							<p class='mui-ellipsis'>即墨宾馆</p>
+						</div>
+					</a>
+					<ul class="mui-table-view mui-table-view-chevron nullul">
+						<li class="mui-table-view-cell" id="tji">
+							<a class="mui-navigate-right" href="#">即墨宾馆 -> 青岛流亭国际机场</a>
+						</li>
+						<li class="mui-table-view-cell" id="fji">
+							<a class="mui-navigate-right" href="#">青岛流亭国际机场 -> 即墨宾馆 </a>
+						</li>
+					</ul>
+				</li>
+
+				<li class="mui-table-view-cell mui-media mui-collapse">
+					<a href="#">
+						<div class="mui-media-object mui-pull-left busfont">平</div>
+						<div class="mui-media-body">
+							平度专线
+							<p class='mui-ellipsis'>东莱大酒店</p>
+						</div>
+					</a>
+					<ul class="mui-table-view mui-table-view-chevron nullul">
+						<li class="mui-table-view-cell" id="tping">
+							<a class="mui-navigate-right" href="#">东莱大酒店 -> 青岛流亭国际机场</a>
+						</li>
+						<li class="mui-table-view-cell" id="fping">
+							<a class="mui-navigate-right" href="#">青岛流亭国际机场 -> 东莱大酒店 </a>
+						</li>
+					</ul>
+				</li>
+
+			</ul>
+		</div>
+
+		<script>
+			mui.init({});
+			mui.ready(function() {
+
+				mui(".nullul").on('tap', '.mui-table-view-cell', function() {
+					//获取id
+					var bid = this.getAttribute("id");
+//					console.log(bid);
+
+					mui.openWindow({
+						id: bid,
+						url: 'dbus/' + bid + '.html'
+					});
+				})
+			});
+		</script>
+
+	</body>
+
+</html>

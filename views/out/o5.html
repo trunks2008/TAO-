@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>PERSON</title>
+
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+		<link rel="stylesheet" href="../../css/mui.min.css">
+		<script src="../../js/mui.min.js"></script>
+
+		<script src="../../js/constants.js"></script>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<h1 class="mui-title">个人</h1>
+		</header>
+
+		<div class="mui-content">
+			<ul class="mui-table-view" style="margin-top: 1px;">
+				<li class="mui-table-view-cell mui-media">
+					<a href="">
+						<img class="mui-media-object mui-pull-left" src="../../img/headman.png">
+						<div class="mui-media-body" id="p_name">未登录</div>
+					</a>
+				</li>
+			</ul>
+
+			<div class="mui-content">
+				<ul class="mui-table-view">
+					<li class="mui-table-view-cell" id="switch">
+						<a class="mui-navigate-right">用户模式切换</a>
+					</li>
+				</ul>
+			</div>
+
+			<!--<div class="mui-content">
+				<ul class="mui-table-view">
+					<li class="mui-table-view-cell" id="logout">
+						<a class="mui-navigate-right">退出登录</a>
+					</li>
+				</ul>
+			</div>-->
+		</div>
+
+		<script>
+			mui.init({});
+			mui.plusReady(function() {
+				document.getElementById('switch').addEventListener('tap', function() {
+					var settings = constants.getSettings();
+					settings.type = null;
+					constants.setSettings(settings);
+
+					mui.openWindow({
+						url: '../preindex.html',
+						id: 'preindex.html',
+						show: {
+							autoShow: true,
+							aniShow: "none",
+							duration: '0'
+						},
+						waiting: {
+							autoShow: false,
+						}
+					});
+				});
+			});
+			
+			var backButtonPress = 0;
+			mui.back = function(event) {
+				backButtonPress++;
+				if(backButtonPress > 1) {
+					plus.runtime.quit();
+				} else {
+					plus.nativeUI.toast('再按一次退出应用');
+				}
+				setTimeout(function() {
+					backButtonPress = 0;
+				}, 1000);
+				return false;
+			};
+		</script>
+	</body>
+
+</html>

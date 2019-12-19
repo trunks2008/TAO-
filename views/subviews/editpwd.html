@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>editpassword</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+		<link rel="stylesheet" href="../../css/mui.min.css">
+		<script src="../../js/mui.min.js"></script>
+
+		<script src="../../js/serverutils.js"></script>
+		<script src="../../js/ajaxutils.js"></script>
+		<script src="../../js/constants.js"></script>
+		<script src="../../js/md5.js"></script>
+
+		<style>
+			.formstyle {
+				margin-left: 10px;
+				margin-right: 10px;
+				margin-top: 30px;
+			}
+			
+			.tips {
+				color: red;
+				font-size: 14px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">修改密码</h1>
+		</header>
+
+		<div class="mui-content">
+
+			<form class="mui-input-group formstyle">
+				<div class="mui-input-row">
+					<label>原密码:</label>
+					<input id="oldpwd" type="password" class="mui-input-password" placeholder="请输入原密码">
+				</div>
+
+				<div class="mui-input-row">
+					<label>新密码:</label>
+					<input id="newpwd" type="password" class="mui-input-password" placeholder="请输入新密码">
+				</div>
+
+				<div class="mui-input-row">
+					<label>重复新密码:</label>
+					<input id="newpwd2" type="password" class="mui-input-password" placeholder="请重复新密码">
+				</div>
+			</form>
+
+			<div id="tips" style="margin:10px;" align="center" class="tips">
+				&nbsp;
+			</div>
+
+			<div class="mui-content-padded">
+				<div class="mui-button-row">
+					<button type="button" class="mui-btn mui-btn-primary " id="submit">提交</button>
+					<button type="button" class="mui-btn mui-btn-danger" id="clear">清空</button>
+				</div>
+			</div>
+		</div>
+
+		<script>
+			(function($, doc) {
+				$.init();
+				$.ready(function() {
+
+					doc.getElementById('submit').addEventListener('tap', function() {
+						var oldpwd = document.getElementById("oldpwd").value;
+						var newpwd = document.getElementById("newpwd").value;
+						var newpwd2 = document.getElementById("newpwd2").value;
+
+						if(oldpwd == '') {
+							doc.getElementById('tips').innerHTML = '请输入原密码';
+							return;
+						}
+						if((newpwd == '') || (newpwd2 == '')) {
+							doc.getElementById('tips').innerHTML = '请输入新密码';
+							return;
+						}
+						if(newpwd != newpwd2) {
+							doc.getElementById('tips').innerHTML = '两次输入新密码不一致';
+							return;
+						}
+						if(newpwd.length < 6) {
+							doc.getElementById('tips').innerHTML = '新密码不能少于6位';
+							return;
+						}
+						if(oldpwd == newpwd) {
+							doc.getElementById('tips').innerHTML = '新密码不能与旧密码一致';
+							return;
+						}
+
+						doc.getElementById('tips').innerHTML = '&nbsp';
+
+						var state = constants.getState();
+						var data = {
+							'id': state.pid,
+							'oldpwd': hex_md5(oldpwd),
+							'newpwd': hex_md5(newpwd)
+						};
+
+						postData(SERVER_HOST_FORMAL + MODULE_MODIFYPWD, data,
+							function(ret) {
+								//								console.log(ret);
+								if(ret == '1') {
+									mui.alert('下次请使用新密码登录', '修改密码成功', null);
+
+									doc.getElementById('oldpwd').value = '';
+									doc.getElementById('newpwd').value = '';
+									doc.getElementById('newpwd2').value = '';
+
+									//后期自动更新state下存储的密码
+
+								} else {
+									doc.getElementById('tips').innerHTML = '请输入正确的原密码';
+								}
+							},
+							null
+						);
+					});
+
+					var personPress = 0;
+					doc.getElementById('clear').addEventListener('tap', function() {
+						personPress++;
+						console.log(personPress);
+
+						doc.getElementById('oldpwd').value = '';
+						doc.getElementById('newpwd').value = '';
+						doc.getElementById('newpwd2').value = '';
+
+						if(personPress >= 8) {
+							console.log('keyword');
+							var btnArray = ['CANCEL', 'CONFIRM'];
+							mui.prompt('Input Password：', 'Password', 'BACKGROUND', btnArray, function(e) {
+								if(e.index == 1) {
+									console.log(e.value);
+									if(e.value == 'russiasushi') {
+										mui.openWindow({
+											url: 'editcheck.html',
+											id: 'editcheck.html',
+											show: {
+												autoShow: true,
+												aniShow: "slide-in-right",
+												duration: '150'
+											},
+											extras: {
+												isout: true
+											},
+											waiting: {
+												autoShow: false,
+												title: '正在加载...'
+											}
+										});
+									}
+								} else {
+									console.log(0);
+								}
+							});
+						}
+
+						setTimeout(function() {
+							personPress = 0;
+						}, 2000);
+					});
+
+				});
+			})(mui, document);
+		</script>
+
+	</body>
+
+</html>

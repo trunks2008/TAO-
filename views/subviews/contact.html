@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>contact</title>
+
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+		<link rel="stylesheet" href="../../css/mui.min.css">
+		<script src="../../js/mui.min.js"></script>
+
+		<script src="../../js/serverutils.js"></script>
+		<script src="../../js/ajaxutils.js"></script>
+
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">联系人信息</h1>
+		</header>
+
+		<div class="mui-content">
+			<ul class="mui-table-view" style="margin-top: 1px;">
+				<li class="mui-table-view-cell mui-media">
+					<a href="">
+						<img class="mui-media-object mui-pull-left" src="../../img/headman.png">
+						<div class="mui-media-body" id="p_name"></div>						
+					</a>
+				</li>
+			</ul>
+
+			<div class="mui-content-padded">
+				<ul class="mui-table-view">
+					<li class="mui-table-view-cell">
+						<span>部门:</span>
+						<span id="dept"></span>
+					</li>
+					<li class="mui-table-view-cell">
+						<span>性别:</span>
+						<span id="sex"></span>
+					</li>
+					<li class="mui-table-view-cell">
+						<span>电话:</span>
+						<span id="mobile"></span>
+					</li>
+				</ul>
+			</div>
+
+		</div>
+
+		<script>
+			mui.init({});
+			mui.plusReady(function() {
+				var self = plus.webview.currentWebview();
+				var p_id = self.p_id;
+				var p_name = self.p_name;
+				document.getElementById('p_name').innerHTML = p_name;
+
+				var date = {
+					'id': p_id
+				}
+				postData(SERVER_HOST_FORMAL + MODULE_CONTACT, date,
+					function(ret) {
+//						console.log(ret);
+						var map = JSON.parse(ret);
+						document.getElementById('dept').innerHTML=map.dept;
+						document.getElementById('sex').innerHTML=map.sex;
+						
+						if((map.mobile==undefined) || (map.mobile=='undefined')){
+							document.getElementById('mobile').innerHTML='暂无联系电话';	
+						}else{							
+							document.getElementById('mobile').innerHTML=map.mobile;
+						}
+					},
+					null
+				);
+			});
+		</script>
+
+	</body>
+
+</html>

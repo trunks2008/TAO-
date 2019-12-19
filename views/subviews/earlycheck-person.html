@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>earlycheck-person</title>
+
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+		<link rel="stylesheet" href="../../css/mui.min.css">
+		<script src="../../js/mui.min.js"></script>
+
+		<script src="../../js/serverutils.js"></script>
+		<script src="../../js/ajaxutils.js"></script>
+		<script src="../../js/timeutils.js"></script>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title" id="fgtitle">早退人员</h1>
+		</header>
+
+		<div class="mui-content">
+			<div class="mui-card">
+				<ul class="mui-table-view" id="mem_ul">
+				</ul>
+			</div>
+		</div>
+
+		<script>
+			mui.init({});
+
+			mui.plusReady(function() {
+				var self = plus.webview.currentWebview();
+				var deptid = self.p_id;
+
+				var nowdate = new Date();
+				nowdate.setDate(nowdate.getDate());
+				var datestr = nowdate.Format("yyyy-MM-dd");
+
+				var data = {
+					d_id: deptid,
+					date: datestr
+				};
+
+				var ul = document.getElementById("mem_ul");
+				postData(SERVER_HOST_FORMAL + MODULE_FULL_DEPT_RECORD, data,
+					function(ret) {
+						console.log(ret);
+						var list = JSON.parse(ret);
+
+						var j=0;
+						for(var i = 0; i < list.length; i++) {
+							if(list[i].endTime && list[i].endTime < '16:00') {
+								console.log(list[i].endTime);
+								
+								var li = document.createElement("li");
+								li.setAttribute("id", list[i].pid);
+								li.setAttribute("class", "mui-table-view-cell mui-media");
+
+								var ga = document.createElement("a");
+
+								var gimag = document.createElement("p");
+								gimag.setAttribute("class", "mui-media-object mui-pull-left");
+								gimag.innerHTML = ++j;
+
+								var gdiv = document.createElement("div");
+								gdiv.setAttribute("class", "mui-media-body");
+								gdiv.innerHTML = list[i].name;
+
+								var gp = document.createElement("p");
+								gp.setAttribute("class", "mui-ellipsis");
+
+								gp.innerHTML = list[i].endTime + '  早退';
+
+								gdiv.appendChild(gp);
+								ga.appendChild(gimag);
+								ga.appendChild(gdiv)
+								li.appendChild(ga);
+								ul.appendChild(li);
+							}
+
+						}
+
+					},
+					null
+				);
+
+			});
+		</script>
+
+	</body>
+
+</html>

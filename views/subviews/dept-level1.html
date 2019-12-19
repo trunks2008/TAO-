@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>dept</title>
+
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+		<script src="../../js/mui.min.js"></script>
+		<script src="../../js/serverutils.js"></script>
+		<script src="../../js/ajaxutils.js"></script>
+		<script src="../../js/mui.picker.js"></script>
+		<script src="../../js/mui.poppicker.js"></script>
+		<script src="../../js/timeutils.js"></script>
+		<script src="../../js/mui.picker.min.js"></script>
+		<script src="../../js/echarts.min.js"></script>
+		<script src="../../js/jquery.min.js"></script>
+		<script src="../../js/bootstrap.min.js"></script>
+
+		<link rel="stylesheet" href="../../css/mui.min.css">
+		<link rel="stylesheet" href="../../css/mui.picker.min.css" />
+		<link rel="stylesheet" href="../../css/mui.poppicker.css" />
+		<link rel="stylesheet" href="../../css/my.css" />
+		<link rel="stylesheet" href="../../css/mytable.css" />
+		<link rel="stylesheet" href="../../css/bootstrap.min.css" />
+
+		<style>
+			.timebtn {
+				font-size: 14px;
+				padding: 4px;
+				margin: 3px;
+			}
+			
+			.deptbtn {
+				font-size: 16px;
+				padding: 8px;
+				margin: 3px;
+				margin-left: 3px;
+				margin-right: 0px;
+				padding-left: 10px;
+			}
+			
+			.timechart {
+				margin-top: 10px;
+				width: 350px;
+				height: 300px;
+			}
+			
+			.ntip {
+				font-size: 26px;
+				text-align: center;
+				padding-top: 200px;
+			}
+			
+			.allfoot {
+				width: 170px;
+				height: 50px;
+				position: fixed;
+				float: right;
+				bottom: 0;
+			}
+			
+			.timechart {
+				margin-top: 10px;
+				width: 240px;
+				height: 240px;
+				margin: 0 auto;
+			}
+			
+			.fctitle {
+				color: #1699C5;
+				font-family: "微软雅黑";
+				font-size: 20px;
+				font-weight: 700;
+			}
+			
+			.fc {
+				margin-top: 3px;
+				font-family: Arial, Helvetica, sans-serif;
+				font-size: 1em;
+				font-size: 30px;
+			}
+			
+			.ulp {
+				padding-left: 200px;
+				padding-right: 200px;
+			}
+			
+			.denum {
+				font-family: "黑体";
+				font-size: 26px;
+			}
+			
+			.dedes {
+				font-family: "黑体";
+				font-weight: 700;
+			}
+			
+			.barchart {
+				width: 400px;
+				height: 300px;
+				padding-left: 0px;
+			}
+			
+			.mad {
+				margin-left: 3px;
+				margin-right: 3px;
+			}
+			
+			.mtitle {
+				float: left;
+				width: 35%;
+				white-space: nowrap;
+				text-overflow: ellipsis;
+				-o-text-overflow: ellipsis;
+				overflow: hidden;
+				padding-left: 6px;
+			}
+			
+			.mbar {
+				width: 60%;
+			}
+			
+			.cardtitle {
+				padding-left: 6px;
+				padding-bottom: 9px;
+				font-size: 16px;
+				color: #1699C5;
+			}
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title" id="deptname"></h1>
+		</header>
+
+		<div class="mui-content">
+
+			<div class="mui-card">
+				<div id="chart" class='timechart'></div>
+				<div align="center">
+					<div class="fctitle">打卡人数/应到人数</div>
+					<p id="fcdata" class="fc"></p>
+				</div>
+				<div align="center">
+					<ul class="mui-table-view mui-grid-view mui-grid-9 ulp" id="homeMenu">
+						<li class="mui-table-view-cell mui-media mui-col-xs-3 mui-col-sm-3" id="uncheck">
+							<span id="notchecked" class="denum">&nbsp;</span>
+							<div class="mui-media-body dedes">未打卡</div>
+							</a>
+						</li>
+						<li class="mui-table-view-cell mui-media mui-col-xs-3 mui-col-sm-3" id="latercheck">
+							<span id="later" class="denum">&nbsp;</span>
+							<div class="mui-media-body dedes">迟到</div>
+							</a>
+						</li>
+						<li class="mui-table-view-cell mui-media mui-col-xs-3 mui-col-sm-3" id="earlyleave">
+							<span id="early" class="denum">&nbsp;</span>
+							<div class="mui-media-body dedes">早退</div>
+							</a>
+						</li>
+						<li class="mui-table-view-cell mui-media mui-col-xs-3 mui-col-sm-3" id="outcheck">
+							<span id="out" class="denum">&nbsp;</span>
+							<div class="mui-media-body dedes">外勤</div>
+							</a>
+						</li>
+
+					</ul>
+				</div>
+			</div>
+
+			<div class="mui-card mycontainer mui-hidden" id="container" style="padding-top: 10px;">
+				<div class="cardtitle">专业线汇总情况：</div>
+			</div>
+
+			<div class="mui-card">
+				<div class="cardtitle">签到明细：</div>
+				<table id="tablevalue" class="table" width="98%">
+					<tr>
+						<th width=30%>人员</th>
+						<th width=34%>签到时间</th>
+						<th width=34%>签退时间</th>
+					</tr>
+				</table>
+			</div>
+
+		</div>
+
+		<script>
+			(function($, doc) {
+				$.init();
+				$.plusReady(function() {
+					var self = plus.webview.currentWebview();
+					var p_id = self.p_id;
+					var d_name = self.d_name;
+
+					//console.log(p_id + d_name);
+
+					document.getElementById('deptname').innerHTML = d_name;
+
+					var nowdate = new Date();
+					nowdate.setDate(nowdate.getDate());
+					var datestr = nowdate.Format("yyyy-MM-dd");
+
+					var data = {
+						d_id: p_id,
+						date: datestr
+					};
+
+					var container = document.getElementById("container");
+
+					postData(SERVER_HOST_FORMAL + MODULE_ALLDEPT_RECORD, data,
+						function(ret) {
+							//console.log(ret);
+
+							//draw chart
+							var myChart = echarts.init(document.getElementById('chart'));
+							//var majorChart = echarts.init(document.getElementById('majorchart'));
+
+							var map = JSON.parse(ret);
+							var all = map['dept_member'];
+							var checked = map['check_member'];
+							var major_count = map['major_count'];
+
+							document.getElementById('fcdata').innerHTML = checked + '/' + all;
+							document.getElementById('notchecked').innerHTML = all - checked;
+							document.getElementById('out').innerHTML = map['outcount'];
+
+							option = {
+								title: {
+									text: new Date().Format("yyyy-MM-dd"),
+									x: 'center',
+									y: 'top',
+									textAlign: 'left'
+								},
+								tooltip: {
+									show: false, //add 关闭悬浮提示 
+									trigger: 'item',
+									formatter: "{b}: {c} ({d}%)"
+								},
+								color: [
+									'#6495ED', '#E9967A'
+								],
+								legend: {
+									orient: 'vertical',
+									x: 'right',
+									data: ['已签到', '未签到']
+								},
+								series: [{
+									name: '签到情况',
+									type: 'pie',
+									radius: ['50%', '70%'],
+									avoidLabelOverlap: false,
+									hoverAnimation: false, //add
+									label: {
+										normal: {
+											//show: false,
+											show: true,
+											position: 'center',
+											formatter: function() {
+												if(all == 0) {
+													return '正常签到率\r\n0%'
+												} else {
+													return '正常签到率\r\n' + (Math.round(checked / all * 10000) / 100.00 + "%")
+												}
+
+											},
+											textStyle: {
+												color: '#1699C5',
+												fontFamily: "微软雅黑",
+												fontSize: 20,
+												fontWeight: 700,
+											}
+										},
+										emphasis: {
+											show: false,
+											textStyle: {
+												fontSize: '30',
+												fontWeight: 'bold'
+											}
+										}
+									},
+									labelLine: {
+										normal: {
+											show: false
+										}
+									},
+									data: [{
+											value: checked,
+											name: '已签到'
+										},
+										{
+											value: all - checked,
+											name: '未签到'
+										}
+									]
+								}]
+							};
+							myChart.setOption(option);
+
+							//专业线分类
+							if(major_count.length == 0) {
+								document.getElementById('container').classList.add('mui-hidden');
+							} else {
+								document.getElementById('container').classList.remove('mui-hidden');
+								for(var i = 0; i < major_count.length; i++) {
+									var map = major_count[i];
+
+									var tt;
+									if(map['ncount'] == undefined) {
+										tt = 0;
+									} else {
+										tt = map['ncount'];
+									}
+
+									var mdiv = document.createElement('div');
+									mdiv.classList.add('mad');
+									mdiv.setAttribute("id", map['dept1']);
+									mdiv.setAttribute("ndeptname", map['ndeptname']);
+									//map['ncount'] / map['memcount']
+									mdiv.setAttribute("ncount", tt);
+									mdiv.setAttribute("memcount", map['memcount']);
+
+									var mtitlediv = document.createElement('div');
+									mtitlediv.classList.add('mtitle');
+									mtitlediv.innerHTML = map['ndeptname'];
+
+									var pbardiv = document.createElement('div');
+									pbardiv.classList.add('progress');
+									pbardiv.classList.add('mbar');
+
+									var pbarinfodiv = document.createElement('div');
+									pbarinfodiv.classList.add('progress-bar');
+									pbarinfodiv.classList.add('progress-bar-info');
+									pbarinfodiv.setAttribute("role", "progressbar");
+
+									if(tt == 0) {
+										pbarinfodiv.setAttribute("aria-valuenow", "0");
+										pbarinfodiv.setAttribute("style", "width:0%");
+									} else {
+										var s = map['ncount'] / map['memcount'] * 100;
+										//console.log(s);
+										pbarinfodiv.setAttribute("aria-valuenow", s);
+										pbarinfodiv.setAttribute("style", "width:" + s + "%");
+									}
+
+									pbarinfodiv.setAttribute("aria-valuemin", "0");
+									pbarinfodiv.setAttribute("aria-valuemax", "100");
+
+									var pspan = document.createElement('span');
+									pspan.innerHTML = tt + '/' + map['memcount'];
+
+									pbardiv.appendChild(pbarinfodiv);
+									pbardiv.appendChild(pspan);
+
+									mdiv.appendChild(mtitlediv);
+									mdiv.appendChild(pbardiv);
+
+									container.appendChild(mdiv);
+								}
+							}
+
+						},
+						null
+					);
+
+					//明细
+					var objTable = document.getElementById("tablevalue");
+					postData(SERVER_HOST_FORMAL + MODULE_FULL_DEPT_RECORD, data,
+						function(ret) {
+							console.log(ret);
+
+							var cate = [];
+							var hours = [];
+							var list = JSON.parse(ret);
+
+							var latercount = 0;
+							var earlycount = 0;
+
+							for(var i = 0; i < list.length; i++) {
+								var att = list[i];
+								var tr = document.createElement('tr');
+								tr.id = att.id;
+
+								var tdname = document.createElement('td');
+								var tdstime = document.createElement('td');
+								var tdetime = document.createElement('td');
+
+								tdname.innerHTML = att.name;
+								tdstime.innerHTML = att.begTime;
+								tdetime.innerHTML = att.endTime;
+
+								cate.unshift(att.name);
+								var diff = TimeDiff(att.endTime, att.begTime);
+								hours.unshift(diff);
+
+								if(att.begTime > '08:30:00') {
+									tdstime.style.color = "Red";
+									latercount++;
+								}
+
+								if((att.endTime != '') && (att.endTime < '16:00:00')) {
+									tdetime.style.color = "red";
+									earlycount++;
+								}
+
+								tr.appendChild(tdname);
+								tr.appendChild(tdstime);
+								tr.appendChild(tdetime);
+
+								objTable.appendChild(tr);
+							}
+
+							document.getElementById('later').innerHTML = latercount;
+							document.getElementById('early').innerHTML = earlycount;
+						},
+						null
+					);
+
+					mui('#container').on('tap', '.mad', function(e) {
+						var sid = this.getAttribute("id");
+						var sname = this.getAttribute("ndeptname");
+						var memcount = this.getAttribute("memcount");
+						var ncount = this.getAttribute("ncount");
+
+						//console.log('click: '+memcount+'   ' + ncount);
+
+						mui.openWindow({
+							url: 'dept-detail.html',
+							id: 'dept-detail.html',
+							show: {
+								autoShow: true,
+								aniShow: "slide-in-right",
+								duration: '250'
+							},
+							extras: {
+								p_id: sid,
+								d_name: sname,
+								memcount: memcount,
+								ncount: ncount
+							},
+							waiting: {
+								autoShow: false, //自动显示等待框，默认为true
+							}
+						});
+					});
+
+					//点人下钻
+					mui('#tablevalue').on('tap', 'td', function(e) {
+						var row = this.parentNode;
+						var index = this.cellIndex;
+						var p_id = row.id;
+						var p_name = row.cells[0].innerHTML;
+
+						mui.openWindow({
+							url: '../sheet/person.html',
+							id: 'person.html',
+							show: {
+								autoShow: true,
+								aniShow: "slide-in-right",
+								duration: '250'
+							},
+							extras: {
+								p_name: p_name,
+								p_id: p_id
+							},
+							waiting: {
+								autoShow: false
+							}
+						});
+					});
+
+					mui("#homeMenu").on('tap', '.mui-table-view-cell', function() {
+						var resourceId = this.getAttribute("id");
+						if(resourceId == "") {
+							return;
+						}
+
+						if(resourceId == 'uncheck') {
+							mui.openWindow({
+								url: 'uncheck-person.html',
+								id: 'uncheck-person.html',
+								show: {
+									autoShow: true,
+									aniShow: "slide-in-right",
+									duration: '250'
+								},
+								extras: {
+									p_id: p_id
+								},
+								waiting: {
+									autoShow: false
+								}
+							});
+						}
+						else if(resourceId == 'latercheck') {
+							mui.openWindow({
+								url: 'latercheck-person.html',
+								id: 'latercheck-person.html',
+								show: {
+									autoShow: true,
+									aniShow: "slide-in-right",
+									duration: '250'
+								},
+								extras: {
+									p_id: p_id
+								},
+								waiting: {
+									autoShow: false
+								}
+							}); 
+						}
+						else if(resourceId == 'outcheck') {
+							mui.openWindow({
+								url: 'outcheck-person.html',
+								id: 'outcheck-person.html',
+								show: {
+									autoShow: true,
+									aniShow: "slide-in-right",
+									duration: '250'
+								},
+								extras: {
+									p_id: p_id
+								},
+								waiting: {
+									autoShow: false
+								}
+							});
+						}
+						else if(resourceId == 'earlyleave') {
+							mui.openWindow({
+								url: 'earlycheck-person.html',
+								id: 'earlycheck-person.html',
+								show: {
+									autoShow: true,
+									aniShow: "slide-in-right",
+									duration: '250'
+								},
+								extras: {
+									p_id: p_id
+								},
+								waiting: {
+									autoShow: false
+								}
+							});
+						}
+
+					});
+
+				});
+			})(mui, document);
+		</script>
+	</body>
+
+</html>

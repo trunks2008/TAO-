@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>inspecthistory</title>
+
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+		<link rel="stylesheet" href="../../css/mui.min.css">
+
+		<script src="../../js/mui.min.js"></script>
+		<script src="../../js/ajaxutils.js"></script>
+		<script src="../../js/serverutils.js"></script>
+
+		<style>
+
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">值班日志</h1>
+		</header>
+
+		<div class="mui-content">
+			<ul class="mui-table-view" id="logList">
+				<!--<li class="mui-table-view-cell">
+					<div class="mui-media-body">
+						2019-07-23 19:00 - 20:00
+						<p class='mui-ellipsis'>巡视：李</p>
+						<p class='mui-ellipsis'>温度：23</p>
+						<p class='mui-ellipsis'>湿度：80</p>
+						<p class='mui-ellipsis'>UPS：80</p>
+						<p class='mui-ellipsis'>6号取号机：正常</p>
+						<p class='mui-ellipsis'>7号取号机：正常</p>
+						<p class='mui-ellipsis'>自助行李托运：正常</p>
+						<p class='mui-ellipsis'>其他：无1</p>
+					</div>
+				</li>-->
+
+			</ul>
+		</div>
+
+		<script>
+			(function($, doc) {
+				$.init();
+
+				$.ready(function() {
+					var logList = doc.getElementById("logList");
+
+					function addList(contentmap) {
+						var li = doc.createElement("li");
+						var table = doc.createElement("div");
+						var pp1 = doc.createElement("p");
+						var pp2 = doc.createElement("p");
+						var pp4 = doc.createElement("p");
+						var pp5 = doc.createElement("p");
+						var pp7 = doc.createElement("p");
+						var pp8 = doc.createElement("p");
+
+						li.setAttribute("class", "mui-table-view-cell");
+						table.setAttribute("class", "mui-media-body");
+						pp1.setAttribute("class", "mui-ellipsis");
+						pp2.setAttribute("class", "mui-ellipsis");
+						pp4.setAttribute("class", "mui-ellipsis");
+						pp5.setAttribute("class", "mui-ellipsis");
+						pp7.setAttribute("class", "mui-ellipsis");
+						pp8.setAttribute("class", "mui-ellipsis");
+
+						table.innerText = contentmap.cdate + "  " + contentmap.ctime;
+						pp1.innerText = "机房温度：" + contentmap.temperature;
+						pp2.innerText = "机房湿度：" + contentmap.humidity+"\r\nUPS：" + contentmap.ups;;						
+						pp4.innerText = "6号门取号机：" + test(contentmap.wifi6);
+						pp5.innerText = "7号口取号机：" + test(contentmap.wifi7)+ "\r\n自助行李托运：" + test(contentmap.self);
+						pp7.innerText = "巡视人：" + contentmap.people;
+						pp8.innerText = "其他：" + contentmap.content;
+
+						li.appendChild(table);
+						table.appendChild(pp1);
+						table.appendChild(pp2);
+						table.appendChild(pp4);
+						table.appendChild(pp5);
+						table.appendChild(pp7);
+						table.appendChild(pp8);
+						logList.appendChild(li);
+					}
+
+					postData(SERVER_HOST_FORMAL + MODULE_INSPECT_HISTORY, {},
+						function(ret) {
+							//														console.log(ret);
+							var list = JSON.parse(ret);
+							for(var i = 0; i < list.length; i++) {
+								var map = list[i];
+								//								console.log(map);
+								addList(map);
+							}
+						},
+						null
+					);
+
+					function test(param) {
+						if(param == '0') {
+							return '正常';
+						} else {
+							return '故障'
+						}
+					}
+
+				});
+			})(mui, document);
+		</script>
+	</body>
+
+</html>

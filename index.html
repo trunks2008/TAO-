@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title>LOGIN</title>
+
+		<script src="js/mui.min.js"></script>
+		<link href="css/mui.min.css" rel="stylesheet" />
+
+		<script src="js/serverutils.js"></script>
+		<script src="js/ajaxutils.js"></script>
+
+		<script src="js/constants.js"></script>
+		<script src="js/md5.js"></script>
+		<script src="js/login.js"></script>
+
+		<style>
+			.title {
+				margin-top: 50px;
+				margin-bottom: 50px;
+				font-size: 30px;
+				text-align: center;
+				font-family: 微软雅黑;
+				font-weight: bold;
+				color: #1699C5;
+			}
+			
+			.formstyle {
+				margin-left: 10px;
+				margin-right: 10px;
+				margin-top: 30px;
+			}
+			
+			.mui-switch-blue.mui-active {
+				border: 1px solid #1699C5;
+				background-color: #1699C5;
+			}
+			
+			.company {
+				width: 100%;
+				height: 50px;
+				position: fixed;
+				bottom: 0;
+				text-align: center;
+				font-size: 11px;
+				z-index: -1;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div class="mui-content">
+			<div style="padding-top: 70px;padding-bottom: 40px;">
+				<div align="center">
+					<img src="img/title_logo.png" style="width: 260px;" />
+				</div>
+			</div>
+
+			<form class="mui-input-group formstyle">
+				<div class="mui-input-row">
+					<label>用户名</label>
+					<input id="name" type="text" class="mui-input-clear" placeholder="请输入用户名">
+				</div>
+				<div class="mui-input-row">
+					<label>密码</label>
+					<input id="pwd" type="password" class="mui-input-password" placeholder="请输入密码">
+				</div>
+			</form>
+
+			<div class="mui-content-padded">
+				<ul class="mui-table-view">
+					<li class="mui-table-view-cell">
+						<span>记住密码</span>
+						<div class="mui-switch mui-active mui-switch-blue" id="remparent">
+							<div class="mui-switch-handle" id="rem"></div>
+						</div>
+					</li>
+					<li class="mui-table-view-cell">
+						<span>自动登录</span>
+						<div class="mui-switch mui-active mui-switch-blue" id="autoparent">
+							<div class="mui-switch-handle" id="auto"></div>
+						</div>
+					</li>
+				</ul>
+			</div>
+
+			<div class="mui-content-padded">
+				<div class="mui-button-row">
+					<button type="button" class="mui-btn mui-btn-primary mui-btn-block" id="confirm" style="border:#1699C5;background-color: #1699C5;">登录</button>
+				</div>
+			</div>
+
+			<div class="mui-content-padded" align="right" id="switch">
+				<span>角色切换</span>
+			</div>
+
+			<div class="company">
+				<div>青岛机场集团 V1.2.5</div>
+				<div>copyright©2019</div>
+			</div>
+		</div>
+
+		<script>
+			mui.init({});
+
+			var menu = null;
+			//初始化，并预加载webview模式的选项卡	
+			function preload() {
+				var menu_style = {
+					left: "-70%",
+					width: '70%',
+					popGesture: "none",
+					render: "always"
+				};
+
+				if(mui.os.ios) {
+					menu_style.zindex = -1;
+				}
+
+				//处理侧滑导航，为了避免和子页面初始化等竞争资源，延迟加载侧滑页面
+				//				menu = mui.openWindow({
+				//					id: 'views/main.html',
+				//					url: 'main.html',
+				//					styles: menu_style,
+				//					show: {
+				//						aniShow: 'none'
+				//					},
+				//					waiting: {
+				//						autoShow: false
+				//					}
+				//				});
+			}
+
+			mui.plusReady(function() {
+				var showGuide = plus.storage.getItem("lauchFlag"); 
+				plus.screen.lockOrientation("portrait-primary"); //仅支持竖屏显示
+				if(showGuide) {
+					plus.navigator.closeSplashscreen(); 
+					plus.navigator.setFullscreen(false);
+					preload(); //预加载
+				} else {
+					mui.openWindow({
+						id: 'guide',
+						url: 'views/guide.html',
+						styles: {
+							popGesture: "none"
+						},
+						show: {
+							aniShow: 'none'
+						},
+						waiting: {
+							autoShow: false
+						}
+					});
+					//延迟的原因：优先打开启动导航页面，避免资源争夺
+					setTimeout(function() {
+						preload(); 
+					}, 200);
+				}
+
+				document.getElementById('confirm').addEventListener('tap', function() {
+					var name = document.getElementById("name");
+					var pass = document.getElementById("pwd");
+
+					var remIsActive = document.getElementById("remparent").classList.contains("mui-active");
+					var aotoIsActive = document.getElementById("autoparent").classList.contains("mui-active");
+
+					var loginInfo = {
+						'account': name.value,
+						'password': pass.value,
+						'rem': remIsActive,
+						'auto': aotoIsActive
+					};
+
+					app.login(loginInfo, function(err) {
+						if(err) {
+							plus.nativeUI.toast(err);
+							return;
+						}
+					});
+				});
+
+				//角色切换后不自动跳回
+				document.getElementById('switch').addEventListener('tap', function() {
+					var settings = constants.getSettings();
+					settings.type = null;
+					constants.setSettings(settings);
+
+					//mui.back();
+					mui.openWindow({
+						url: 'views/preindex.html',
+						id: 'preindex.html',
+						show: {
+							autoShow: true,
+							aniShow: "slide-in-right",
+							duration: '250'
+						},
+						waiting: {
+							autoShow: false,
+						}
+					});
+				});
+
+				var self = plus.webview.currentWebview();
+				var islogout = self.isout;
+				//remember account
+				var settings = constants.getSettings();
+				//旅客用户无需登录，可直接进入
+				if(settings.type == 'traveller') {
+					mui.openWindow({
+						url: 'views/out/outmain.html',
+						id: 'outmain.html',
+						show: {
+							autoShow: true,
+							aniShow: "none",
+							duration: '0'
+						},
+						waiting: {
+							autoShow: false,
+						}
+					});
+				} else {
+					if(settings.rem == true) {
+						document.getElementById('name').value = settings.account;
+						document.getElementById('pwd').value = settings.password;
+					} else {
+						document.getElementById('name').value = null;
+						document.getElementById('pwd').value = null;
+					}
+
+					if((settings.auto == true) && (islogout != true)) {
+						var loginbtn = document.getElementById('confirm');
+						mui.trigger(loginbtn, 'tap');
+					} else {
+						//mui("#autoparent").switch().toggle();  //not well
+					}
+				}
+
+			});
+
+			//屏蔽返回
+			var backButtonPress = 0;
+			mui.back = function(event) {
+				backButtonPress++;
+				if(backButtonPress > 1) {
+					plus.runtime.quit();
+				} else {
+					plus.nativeUI.toast('再按一次退出应用');
+				}
+				setTimeout(function() {
+					backButtonPress = 0;
+				}, 1000);
+				return false;
+			};
+		</script>
+	</body>
+
+</html>

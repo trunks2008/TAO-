@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>group</title>
+
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+		<script src="../../js/mui.min.js"></script>
+		<script src="../../js/serverutils.js"></script>
+		<script src="../../js/ajaxutils.js"></script>
+
+		<link rel="stylesheet" href="../../css/mui.min.css">
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">我的群组</h1>
+		</header>
+
+		<div class="mui-content">
+			<div class="mui-card">
+				<ul class="mui-table-view" id="group_ul">
+				</ul>
+			</div>
+		</div>
+
+		<script>
+			(function($, doc) {
+				$.init();
+				
+				$.plusReady(function() {
+					var self = plus.webview.currentWebview();
+					var p_id = self.p_id;
+					var data = {'pid': p_id};
+					
+					var tmap={};
+					
+					postData(SERVER_HOST_FORMAL + MODULE_BELONG_GROUP, data,
+						function(ret) {
+//							console.log(ret);
+							var list = JSON.parse(ret);
+							if(list.length == 0) {
+
+							} else {
+								var ul = document.getElementById("group_ul");
+
+								for(var i = 0; i < list.length; i++) {
+									var li = doc.createElement("li");
+									li.setAttribute("id", list[i].gid);
+									li.setAttribute("class", "mui-table-view-cell mui-media");
+
+									var ga = doc.createElement("a");
+
+									var gimag = doc.createElement("img");
+									gimag.setAttribute("class", "mui-media-object mui-pull-left");
+									gimag.setAttribute("src", "../../img/wg.png");
+
+									var gdiv = doc.createElement("div");
+									gdiv.setAttribute("class", "mui-media-body");
+									gdiv.innerHTML = list[i].gname;
+
+									var gp = doc.createElement("p");
+									gp.setAttribute("class", "mui-ellipsis");
+									gp.innerHTML = '群组人数:' + list[i].gnum;
+
+									gdiv.appendChild(gp);
+									ga.appendChild(gimag);
+									ga.appendChild(gdiv)
+									li.appendChild(ga);
+									ul.appendChild(li);
+									
+									tmap[list[i].gid]=list[i].gname;
+								}
+							}
+						});
+
+					mui('#group_ul').on('tap', 'li', function(e) {
+						var gid=this.getAttribute("id");
+//						console.log(tmap[gid]);
+
+						mui.openWindow({
+							url: '../subviews/free-group.html',
+							id: 'free-group.html',
+							show: {
+								autoShow: true, //页面loaded事件发生后自动显示，默认为true
+								aniShow: "slide-in-right",
+								duration: '250'
+							},
+							extras: {
+								gid: gid,
+								gname:tmap[gid]
+							},
+							waiting: {
+								autoShow: false, //自动显示等待框，默认为true
+							}
+						});
+
+					});
+				});
+
+			})(mui, document);
+		</script>
+	</body>
+
+</html>

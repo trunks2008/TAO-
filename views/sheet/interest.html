@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>intertest</title>
+
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+		<link rel="stylesheet" href="../../css/mui.min.css">
+		<link rel="stylesheet" href="../../css/my.css" />
+		<link rel="stylesheet" href="../../css/mytable.css" />
+		<link rel="stylesheet" href="../../css/mui.picker.min.css" />
+
+		<script src="../../js/mui.min.js"></script>
+		<script src="../../js/serverutils.js"></script>
+		<script src="../../js/ajaxutils.js"></script>
+		<script src="../../js/constants.js"></script>
+		<script src="../../js/timeutils.js"></script>
+		<script src="../../js/mui.picker.min.js"></script>
+
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">我的关注</h1>
+		</header>
+
+		<nav class="mui-bar mui-bar-tab">
+			<a class="mui-tab-item" href="#" id="editlist">
+				<span class="mui-icon mui-icon-compose"></span>
+				<div>
+					<span class="mui-tab-label">维护关注列表</span>
+				</div>
+			</a>
+			<a class="mui-tab-item" href="#" id="inlist">
+				<span class="mui-icon mui-icon-list"></span>
+				<div>
+					<span class="mui-tab-label">我的关注列表</span>
+					<span class="mui-badge mui-badge-warning" id="insize"></span>
+				</div>
+			</a>
+		</nav>
+
+		<div class="mui-content">
+			<div>
+				<span class="ptextcenter" sytle="font-size:14px">日期:</span>
+				<button id="start" class="btn mui-btn checkbtn" style="margin-left: 3px;">选择日期 </button>
+				<button id="query" class="btn mui-btn mui-btn-blue checkbtn" style="float: right;margin-right: 10px;">查询</button>
+			</div>
+
+			<table width="98%" class="table" id="tablevalue">
+				<tr>
+					<th width=20%>人员</th>
+					<th width=30%>日期</th>
+					<th width=24%>签到时间</th>
+					<th width=24%>签退时间</th>
+				</tr>
+			</table>
+
+		</div>
+
+		<script>
+			(function($, doc) {
+				$.init();
+				$.ready(function() {
+					var nowdate = new Date();
+					nowdate.setDate(nowdate.getDate());
+					doc.getElementById('start').innerHTML = nowdate.Format("yyyy-MM-dd");
+
+					var state = constants.getState();
+
+					doc.getElementById('start').addEventListener('tap', function() {
+						var dtPicker = new mui.DtPicker({　　　　
+							"type": "date"
+						});
+						dtPicker.show(function(rs) {
+							doc.getElementById('start').innerHTML = rs.text;
+						});　
+					})
+
+					var data = {
+						'id': state.pid,
+						'date': nowdate.Format("yyyy-MM-dd")
+					};
+
+					var inlist = [];
+
+					postData(SERVER_HOST_FORMAL + MODULE_INTEREST, data,
+						function(ret) {
+//							console.log(ret);
+							dataHandle(ret);
+						},
+						null
+					);
+
+					function dataHandle(data) {
+						//table
+						var objTable = document.getElementById("tablevalue");
+						//clean before insert new data
+						var len = objTable.rows.length;
+						if(len > 1) {
+							for(var i = len - 1; i > 0; i--) {
+								document.getElementById("tablevalue").deleteRow(1);
+							}
+						}
+
+						var mmap = JSON.parse(data);
+						var size = mmap.size;
+						inlist = mmap.inlist;
+						document.getElementById("insize").innerHTML = size;
+
+						var map = mmap.acc;
+						for(var key in map) {
+							var att = map[key];
+
+							var tr = document.createElement('tr');
+							tr.id = att.id;
+
+							var tdname = document.createElement('td');
+							var tddate = document.createElement('td');
+							var tdstime = document.createElement('td');
+							var tdetime = document.createElement('td');
+
+							tdname.innerHTML = att.name;
+							tddate.innerHTML = att.date;
+							tdstime.innerHTML = att.begTime;
+							tdetime.innerHTML = att.endTime;
+
+							if(att.begTime > '08:30:00') {
+								tdstime.style.color = "Red";
+							}
+
+							if(att.endTime < '16:00:00') {
+								tdetime.style.color = "red";
+							}
+
+							tr.appendChild(tdname);
+							tr.appendChild(tddate);
+							tr.appendChild(tdstime);
+							tr.appendChild(tdetime);
+
+							objTable.appendChild(tr);
+						}
+					}
+
+					doc.getElementById('query').addEventListener('tap', function() {
+						var stvalue = document.getElementById('start').innerHTML;
+						var data = {
+							'id': state.pid,
+							'date': stvalue
+						};
+
+						postData(SERVER_HOST_FORMAL + MODULE_INTEREST, data,
+							function(ret) {
+								dataHandle(ret);
+							},
+							null
+						);
+					});
+
+					document.getElementById("inlist").addEventListener('tap', function() {
+						
+						console.log(inlist);
+						if(inlist.length==0){
+							console.log('null');
+							var btnArray = ['确定'];
+							mui.confirm('您的关注列表为空', '提示', btnArray, null);
+							return ;
+						}
+						
+						var ldata = {
+							'list': inlist
+						};
+
+						postData(SERVER_HOST_FORMAL + MODULE_INTEREST_LIST, ldata,
+							function(ret) {
+								var retList = JSON.parse(ret);
+
+								var str = '';
+								for(var i = 0; i < retList.length; i++) {
+									var tmp = retList[i];
+									str += tmp.name;
+									str += '\t\t\t';
+									str += tmp.dept;
+									str += '\r\n';
+								}
+
+								var btnArray = ['确定'];
+								mui.confirm(str, '关注列表', btnArray, null);
+							},
+							null
+						);
+					});
+
+					//edit button
+					document.getElementById("editlist").addEventListener('tap', function() {
+						mui.openWindow({
+							url: '../subviews/editlist.html',
+							id: 'editlist.html',
+							show: {
+								autoShow: true, //页面loaded事件发生后自动显示，默认为true
+								aniShow: "slide-in-right",
+								duration: '250'
+							},		
+//							extras:{
+//						    	inlist:inlist
+//						   	},						
+							waiting: {
+								autoShow: false, //自动显示等待框，默认为true
+							}
+						});
+					});
+
+					$('#tablevalue').on('tap', 'td', function(e) {
+						var row = this.parentNode;
+						var index = this.cellIndex;
+						var p_id = row.id;
+						var p_name = row.cells[0].innerHTML;
+						var p_date = row.cells[1].innerHTML;
+						//console.log(p_id+' | '+index +"  |  "+p_date);
+
+						// person
+						if(index == 0) {
+							mui.openWindow({
+								url: 'person.html',
+								id: 'info.html',
+								show: {
+									autoShow: true, //页面loaded事件发生后自动显示，默认为true
+									aniShow: "slide-in-right",
+									duration: '250'
+								},
+								extras: {
+									p_name: p_name,
+									p_id: p_id
+								},
+								waiting: {
+									autoShow: false, //自动显示等待框，默认为true
+								}
+							});
+
+						} else if((index == 2) || (index == 3)) { //detail
+							var data = {
+								'id': p_id,
+								'start': p_date,
+								'end': p_date
+							};
+
+							postData(SERVER_HOST_FORMAL + MODULE_DETAIL, data,
+								function(data) {
+									//console.log(data);							
+									var list = JSON.parse(data);
+									var str = '';
+									for(var i = 0; i < list.length; i++) {
+										var tmp = list[i];
+										str += tmp.time;
+										str += ',';
+										str += tmp.type;
+										str += ',';
+										str += tmp.machine;
+										str += '\r\n';
+									}
+
+									var btnArray = ['确定'];
+									mui.confirm(str, '详细信息', btnArray, null);
+								},
+								null
+							);
+						}
+
+					});
+
+				});
+			})(mui, document);
+		</script>
+	</body>
+
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>background</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+		<link rel="stylesheet" href="../../css/mui.min.css">
+		<script src="../../js/mui.min.js"></script>
+
+		<script src="../../js/serverutils.js"></script>
+		<script src="../../js/ajaxutils.js"></script>
+		<script src="../../js/constants.js"></script>
+		<script src="../../js/md5.js"></script>
+
+		<style>
+			.formstyle {
+				margin-left: 10px;
+				margin-right: 10px;
+				margin-top: 30px;
+			}
+			
+			.tips {
+				color: red;
+				font-size: 14px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">哈哈哈哈</h1>
+		</header>
+
+		<div class="mui-content">
+
+			<form class="mui-input-group formstyle">
+				<div class="mui-input-row">
+					<label>ID:</label>
+					<input id="ppid" type="label" class="mui-input-clear">
+				</div>
+
+				<div class="mui-input-row">
+					<label>NAME:</label>
+					<input id="ppname" type="label" class="mui-input-clear">
+				</div>
+
+				<div class="mui-input-row">
+					<label>TYPE:</label>
+					<input id="pptype" type="label" class="mui-input-clear">
+				</div>
+			</form>
+
+			<div id="tips" style="margin:10px;" align="center" class="tips">
+				&nbsp;
+			</div>
+
+			<div class="mui-content-padded">
+				<div class="mui-button-row">
+					<button type="button" class="mui-btn mui-btn-primary " id="submit">提交</button>
+					<button type="button" class="mui-btn mui-btn-danger" id="clear">清空</button>
+				</div>
+			</div>
+		</div>
+
+		<script>
+			(function($, doc) {
+				$.init();
+				$.ready(function() {
+
+					doc.getElementById('submit').addEventListener('tap', function() {
+						var sdata = {
+							'id': document.getElementById("ppid").value,
+							'name': document.getElementById("ppname").value,
+							'position': document.getElementById("pptype").value
+						};
+
+						postData(SERVER_HOST_FORMAL + MODULE_SIGN, sdata,
+							function(ret) {
+								if(ret > 0) {
+									mui.confirm('签到成功!', '提示', btnArray, null);
+								} else {
+									mui.confirm('签到失败，请稍后重试!', '提示', btnArray, null);
+								}
+							},
+							null
+						);
+					});
+
+				});
+			})(mui, document);
+		</script>
+
+	</body>
+
+</html>
